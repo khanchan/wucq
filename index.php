@@ -1,1 +1,2 @@
-wuchangqian
+<?php
+echo 'wcq';
