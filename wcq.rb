@@ -5,3 +5,7 @@ class Wcq
     p name
   end
 end
+
+me = Wcq.new
+
+me.name
