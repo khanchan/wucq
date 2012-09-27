@@ -9,3 +9,4 @@ end
 me = Wcq.new
 
 me.name
+me.name
