@@ -11,3 +11,4 @@ me = Wcq.new
 me.name
 me.name
 me.name
+#----------------------
