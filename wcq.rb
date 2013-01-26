@@ -1,4 +1,7 @@
-#! /usr/bin/env ruby
+#! /usr/bin/ruby
+
+#10.times{|i| puts i;}
+
 class Wcq
   # To change this template use File | Settings | File Templates.
   def name(name='wuchangqina')
