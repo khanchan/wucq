@@ -19,9 +19,14 @@ function bin_search($ary , $val){
 
 function test(){
 
-	$ary = range(1,101);
-	echo(bin_search($ary , 4.3));
-	echo(bin_search($ary , 300));
-	echo(bin_search($ary , 101));
+	$start = 1;
+	$end   = 100;
+	$tmp   = range($start   , $end);
+	$find  = range($start-5 , $end+5);
+	foreach($find as $val){
+
+		echo "$val : " , bin_search($tmp , $val) , "\n";
+	}
+
 }
 test();
