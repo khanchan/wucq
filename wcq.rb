@@ -19,3 +19,4 @@ me.name
 #####
 # 这里是一些中的注释信息
 #  addd 
+#  add at ubuntu
