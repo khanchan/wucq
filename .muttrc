@@ -1,13 +1,6 @@
-set folder='~/Mail'
-set sendmail="/usr/bin/msmtp"
+set sendmail="/usr/local/bin/msmtp"
+set envelope_from=yes
 set use_from=yes
-set envelope_from=yes   
 set realname="wuchangqian"
-set from="wuchangqian@gmail.com"
+set from="wcq@94313.net"
 set editor="vim"
-set pop_last=yes
-set pop_pass=
-set pop_user="wuchangqian@gmail.com"
-set pop_host="pops://pop.gmail.com"
-
-
