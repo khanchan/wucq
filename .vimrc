@@ -239,4 +239,4 @@ nmap wm :WMToggle<cr>
 set guifont=Courier\ New:h18
 set cscopequickfix=s-,c-,d-,i-,t-,e-
 set wrap
-set no
+set nu
