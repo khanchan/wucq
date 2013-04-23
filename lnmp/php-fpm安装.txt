@@ -1,0 +1,50 @@
+
+groupadd www
+useradd www -M -g www
+
+### 依赖的libmcrypt 
+
+ftp://mcrypt.hellug.gr/pub/crypto/mcrypt/libmcrypt/libmcrypt-2.5.7.tar.gz
+也可以去http://sourceforge.net/projects/mcrypt/files/Libmcrypt/
+
+
+/server/php-5.3.23/configure \
+--prefix=/server/php5 \
+--with-config-file-path=/server/php5/etc \
+--enable-fpm \
+--with-fpm-user=www \
+--with-fpm-group=www \
+--with-openssl \
+--with-mysql=/usr/local/mysql \
+--with-mysql-sock=/tmp \
+--with-gd \
+--with-jpeg-dir \
+--with-png-dir \
+--with-freetype-dir \
+--with-iconv-dir \
+--with-zlib-dir \
+--with-mcrypt \
+--enable-soap \
+--enable-gd-native-ttf \
+--enable-ftp \
+--enable-mbstring \
+--enable-exif \
+--enable-zend-multibyte \
+--disable-ipv6 \
+--enable-fastcgi \
+--with-pear \
+--with-curl \
+--with-libxml-dir \
+
+make && make install 
+
+ln -s /server/php5/bin/pear      /usr/local/bin/pear
+ln -s /server/php5/bin/peardev   /usr/local/bin/peardev
+ln -s /server/php5/bin/pecl      /usr/local/bin/pecl
+ln -s /server/php5/bin/phar.phar /usr/local/bin/phar
+ln -s /server/php5/bin/php       /usr/local/bin/php
+ln -s /server/php5/bin/phpize    /usr/local/bin/phpize
+ln -s /server/php5/sbin/php-fpm  /usr/local/sbin/php-fpm
+
+cp /server/php-5.3.23/php.ini-production /server/php5/etc/php.ini
+cp /server/php5/etc/php-fpm.conf.default /server/php5/etc/php-fpm.conf
