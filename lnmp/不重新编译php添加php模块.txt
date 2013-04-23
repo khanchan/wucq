@@ -1,61 +1,61 @@
-ÒÔÌí¼ÓftpÄ£¿éÎªÀı×Ó
+ä»¥æ·»åŠ ftpæ¨¡å—ä¸ºä¾‹å­
 
-½øÈëÔ´ÂëÄ¿Â¼
+è¿›å…¥æºç ç›®å½•
 
 cd php-5.2.13/ext/ftp
-#ÔËĞĞphpizeÉú³Éconfigure
+#è¿è¡Œphpizeç”Ÿæˆconfigure
 
 /usr/local/php/bin/phpize
 
-#±àÒë,Ö¸¶¨php-config,×¢ÒâÕâÀïµÄphp-config,²»ÊÇphp.ini
+#ç¼–è¯‘,æŒ‡å®šphp-config,æ³¨æ„è¿™é‡Œçš„php-config,ä¸æ˜¯php.ini
 
 ./configure --with-php-config=/usr/local/php/bin/php-config
-#ÉÏÃæ¿ÉÒÔÌí¼Ó--enable-ftp,Ò²¿ÉÒÔ²»ÓÃÌí¼Ó
+#ä¸Šé¢å¯ä»¥æ·»åŠ --enable-ftp,ä¹Ÿå¯ä»¥ä¸ç”¨æ·»åŠ 
 
-#±àÒë°²×°
+#ç¼–è¯‘å®‰è£…
 
 make;make install
 
-#Éú³ÉÒ»¸öÄ¿Â¼À´´æ·ÅÀ©Õ¹µÄÄ£¿é
+#ç”Ÿæˆä¸€ä¸ªç›®å½•æ¥å­˜æ”¾æ‰©å±•çš„æ¨¡å—
 
 mkdir /usr/local/php/etc/php/ext
 
-#¸´ÖÆftp.soµ½Ä£¿éÄ¿Â¼  ===> ÆäÊµmake install »á×öÕâÒ»²½
+#å¤åˆ¶ftp.soåˆ°æ¨¡å—ç›®å½•  ===> å…¶å®make install ä¼šåšè¿™ä¸€æ­¥
 
 cp /usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/ftp.so /usr/local/php/etc/ext/
 
-#±à¼­php.iniÎÄ¼ş,Ö¸¶¨PHPµ½ÄÄ¸öÄ¿Â¼¶ÁÄ£¿é
+#ç¼–è¾‘php.iniæ–‡ä»¶,æŒ‡å®šPHPåˆ°å“ªä¸ªç›®å½•è¯»æ¨¡å—
 
 vi /usr/local/php/etc/php.ini
 
 extension_dir="/usr/local/php/etc/ext"
-#LoadÄ£¿é
+#Loadæ¨¡å—
 extension=ftp.so
-#±£´æÍË³ö
+#ä¿å­˜é€€å‡º
 
-ÖØÆôapache
-ÔÙÓÃ/usr/local/php/bin/php -m|grep ftp²é¿´ÊÇ·ñÓĞftp.so
+é‡å¯apache
+å†ç”¨/usr/local/php/bin/php -m|grep ftpæŸ¥çœ‹æ˜¯å¦æœ‰ftp.so
 
 ================================================================================================
 ================================================================================================
 ================================================================================================
 ================================================================================================
-°²×°pdo_mysqlÄ£¿é
+å®‰è£…pdo_mysqlæ¨¡å—
 
 /usr/local/php/bin/phpize ./configure --with-php-config=/usr/local/php/bin/php-config
 
-×¢Òâ£ºphp°²×°ÔÚ/usr/local/phpÏÂ
+æ³¨æ„ï¼šphpå®‰è£…åœ¨/usr/local/phpä¸‹
 
 ./configure --with-php-config=/server/php5/bin/php-config --with-pdo-mysql=/usr/local/mysql/
 make && make install
 
-×¢ÒâÌáÊ¾ pdo_mysql µÄÂ·¾¶ÊÇ£º
+æ³¨æ„æç¤º pdo_mysql çš„è·¯å¾„æ˜¯ï¼š
 /server/php5/lib/php/extensions/no-debug-non-zts-20090626/
 
 
-È»ºó:
+ç„¶å:
 
 # vi /usr/local/php/lib/php.ini
-¼ÓÉÏÒ»¾ä£º
+åŠ ä¸Šä¸€å¥ï¼š
 extension=pdo_mysql.so
-±£´æºó£¬ÖØÆôphp-fpm
+ä¿å­˜åï¼Œé‡å¯php-fpm

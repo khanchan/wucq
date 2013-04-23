@@ -1,4 +1,4 @@
-1, ���� iptables  д������ķ���ǽ���� ȷ����Ч
+﻿1, 启动 iptables  写入基本的防火墙规则 确保生效
     vi /etc/sysconfig/iptables
 
 
@@ -22,25 +22,25 @@ COMMIT
 
 
 
-2���޸�SSH�˿�
+2，修改SSH端口
 
     vi /etc/ssh/sshd_config
    
-3����װAPF ����ǽ  ����װBFD���ƽ�
+3，安装APF 防火墙  并安装BFD防破解
 
    wget http://www.rfxn.com/downloads/apf-current.tar.gz
 
    cd apf-9.7-2
    ./install.sh
    vim /etc/apf/conf.apf
-   �������� IFACE_IN �� IFACE_OUT
+   更改网卡 IFACE_IN 和 IFACE_OUT
 
    
-   DEVEL_MODE="0"   �رյ���
+   DEVEL_MODE="0"   关闭调试
 
 http://www.securecentos.com/install-apf-firewall-on-your-centos-linux-server/
 
-  APF��9.6 (rev:2)�汾֮��������RABģ��.��ģ��ȡ���˾ɰ汾��antidosģ��.
+  APF自9.6 (rev:2)版本之后增加了RAB模块.该模块取代了旧版本的antidos模块.
 
 
    wget http://www.rfxn.com/downloads/bfd-current.tar.gz
@@ -48,26 +48,26 @@ http://www.securecentos.com/install-apf-firewall-on-your-centos-linux-server/
 
 
 
-4���޸�yumԴ���ã�ֻ��װ64λ�������
+4，修改yum源配置，只安装64位的组件。
 vi /etc/yum.conf
 
-����һ��
+增加一行
 
 exclude=*.i?86
 
-ɾ���Ѿ���װ�ķ�64λԴ��
+删除已经安装的非64位源。
 
 yum remove \*.i\?86
 
 
-���������ܸ��µ�����
+更新所有能更新的软件
 
 yum --exclude=httpd* --exclude=php* update
 
 
 yum remove httpd php
 
-5����׼�� yum install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
+5，做准备 yum install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
 
 yum install ntp libc-client-devel vim-enhanced bison curl curl-devel gettext-devel flex autoconf automake gcc gcc-c++ apr-devel apr-util-devel bzip2-devel gmp-devel pspell-devel libxml2-devel pam-devel libtiff-devel  libjpeg-devel freetype-devel  libmcrypt-devel freetype libevent* libtool
 
@@ -78,17 +78,17 @@ yum install perl-Net-SSLeay perl-Crypt-SSLeay perl-DBI perl-DBD-MySQL
 
 
 
-6,�ر�selinux   ������װ����ٴ򿪵���һ��
+6,关闭selinux   整个安装完后再打开调试一下
 /usr/sbin/setenforce 0
 vi /etc/sysconfig/selinux 
 
 
 
-��С����װʱ     ��װ������Ŀ�������   yum groupinstall "Development Tools" "Legacy Software Development"
+最小化安装时     安装最基本的开发工具   yum groupinstall "Development Tools" "Legacy Software Development"
 
 ------------------------------------------------
 
-��װ mysql    http://www.1987.name/515.html
+安装 mysql    http://www.1987.name/515.html
 
 wget http://downloads.mysql.com/archives/mysql-5.1/mysql-5.1.61.tar.gz    http://downloads.mysql.com/archives/mysql-5.1/mysql-5.1.66.tar.gz
 
@@ -108,7 +108,7 @@ cp -rf support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
 
 vi /etc/my.cnf
 
-��[mysqld]��������
+在[mysqld]区域增加
 
 basedir = /server/mysql
 datadir = /server/mysql/data
@@ -149,16 +149,16 @@ service mysqld start
 SHOW variables like "have_%";
 
 
-������־��/server/mysql/data/localhost.localdomain.err
+错误日志：/server/mysql/data/localhost.localdomain.err
 
 show databases;
 
 
-ʣ�µľ����Ż�mysql    �������
+剩下的就是优化mysql    提高性能
 
 ---------------------------------------------------------------------
 
-��װ apache 
+安装 apache 
 
 cd /opt
 
@@ -174,19 +174,19 @@ make;make install
 
 vi /server/apache/conf/httpd.conf  
 
-ServerName  ȥ�� #
+ServerName  去掉 #
 
-<Directory />����AllowOverride All����</Directory>
+<Directory />　　AllowOverride All　　</Directory>
 
 
 
 
 vi /server/apache/conf/extra/httpd-default.conf
 
-ServerTokens OS��    �޸�Ϊ��ServerTokens Prod ���ڳ��ִ���ҳ��ʱ����ʾ����������ϵͳ�����ƣ�
-ServerSignature On�� �޸�Ϊ��ServerSignature Off ���ڴ���ҳ�в���ʾApache�İ汾��
+ServerTokens OS　    修改为：ServerTokens Prod （在出现错误页的时候不显示服务器操作系统的名称）
+ServerSignature On　 修改为：ServerSignature Off （在错误页中不显示Apache的版本）
 
-MaxKeepAliveRequests 100    �޸�Ϊ��MaxKeepAliveRequests 5000 ������ͬʱ��������
+MaxKeepAliveRequests 100    修改为：MaxKeepAliveRequests 5000 （增加同时连接数）
 
 
 cp /server/apache/bin/apachectl /etc/init.d/httpd
@@ -209,7 +209,7 @@ service httpd start
 
 ---------------------------------
 
-��װPHPǰ׼������
+安装PHP前准备工作
 
 cd ..
 http://www.fastcgi.com/dist/mod_fastcgi-2.4.6.tar.gz
@@ -246,7 +246,7 @@ gzip -cd php-5.2.17-fpm-0.5.14.diff.gz | patch -d php-5.2.17 -p1
 
 
 
-http://mirrors.ustc.edu.cn/gnu/libtool/libtool-2.4.2.tar.gz     ---��
+http://mirrors.ustc.edu.cn/gnu/libtool/libtool-2.4.2.tar.gz     ---略
 
 tar zxvf libtool-2.4.2.tar.gz
 cd libtool-2.4.2
@@ -370,7 +370,7 @@ cd ..
 
 ------------------------------------------------------------------
 
-��װ PHP 
+安装 PHP 
 
 
 
@@ -384,12 +384,12 @@ cd ..
 
  
 
-vi Makefile ��Լ77 �����ҵĵط�: EXTRA_LIBS = ..... -lcrypt �������� -liconv������: EXTRA_LIBS = ..... -lcrypt -liconv Ȼ�������ٴ� make ���ɡ�
+vi Makefile 大约77 行左右的地方: EXTRA_LIBS = ..... -lcrypt 在最后加上 -liconv，例如: EXTRA_LIBS = ..... -lcrypt -liconv 然后重新再次 make 即可。
 make
 make install
 
 
-�鿴  vi /server/apache/conf/httpd.conf
+查看  vi /server/apache/conf/httpd.conf
 
 
 
@@ -429,7 +429,7 @@ ln -s  /server/php/etc/php.ini  /etc/php.ini
 
 vi /server/php/etc/php-fpm.conf 
 
-ȡ�� nobodyע��
+取消 nobody注释
 
 /server/php/sbin/php-fpm start
 
@@ -458,7 +458,7 @@ chkconfig php-fpm on
 
 --------------------------------------------
 
-��װAPC
+安装APC
 
 cd ..
 http://pecl.php.net/get/APC-3.1.11.tgz          http://pecl.php.net/get/APC-3.1.14.tgz     http://pecl.php.net/get/APC-3.1.9.tgz
@@ -474,12 +474,12 @@ make;make install
 
 vi /server/php/etc/php.ini
 
-����extension_dir = /server/php/lib/php/extensions/no-debug-non-zts-20060613/  
+查找extension_dir = /server/php/lib/php/extensions/no-debug-non-zts-20060613/  
                   
 
-�������� extension = "apc.so"
+下面添加 extension = "apc.so"
 
-����php.ini ĩβ����
+配置php.ini 末尾加入
 
 [apc]
 apc.enabled = 1
@@ -489,7 +489,7 @@ apc.user_ttl = 86400
 apc.num_files_hint = 10000
 apc.user_entries_hint = 10000
 apc.max_file_size = 5M
-apc.stat = 0  (0�ǲ�����PHP�ļ���
+apc.stat = 0  (0是不更新PHP文件）
 
 
 
@@ -498,7 +498,7 @@ cp apc.php /server/apache/htdocs
 cd ..
 ------------------------------------
 
-��װ webmin
+安装 webmin
 
 
 
@@ -524,26 +524,26 @@ iptables -A INPUT -p tcp --dport 14334 -m state --state NEW,ESTABLISHED,RELATED 
 
 -----------------------------------------------
 
-���� webmin  
+配置 webmin  
 
 yum  -y install sendmail  sendmail-cf  m4
 
-������ sendmail
+并启动 sendmail
 
 
-���� apache ������
-���� mysql ������
+配置 apache 服务器
+配置 mysql 服务器
 
-ɾ��mysql�����û�
+删除mysql匿名用户
 
 ---------------------------------------------------
 
-�鿴ϵͳ����
+查看系统限制
 
 ulimit -n
 
 
-���� 
+增加 
 
 ulimit -SHn 65535
 
@@ -562,7 +562,7 @@ fs.file-max = 1966050
 
 --------------------------------------
 
-apache ���� 
+apache 设置 
 http://www.phpchina.com/resource/manual/apache/mod/worker.html
 
 http://hi.baidu.com/ostech/item/75844640feefb39e823ae184
@@ -570,31 +570,31 @@ http://hi.baidu.com/ostech/item/75844640feefb39e823ae184
 http://www.5iphp.com/apache-MPM-prefork-worker
 http://wenku.baidu.com/view/962ffb1910a6f524ccbf85c2.html
 
-Server--->httpd �ӽ���
-Threads --->���̵��߳�
+Server--->httpd 子进程
+Threads --->进程的线程
 
 
 
-    ServerLimit		500        Ĭ�ϵ����httpd�ӽ���������16, Ϊ�˼Ӵ��ӽ�����������Ҫһ��ʼ���������ӽ���������
-    ThreadLimit		64         ÿ���ӽ��̵��߳�Ĭ�ϵ���������� 64����Ҫһ��ʼ���������߳�������
-    StartServers          10         һ��ʼ�������ٸ����̡�
-    ThreadsPerChild      20         �̶�����ÿ�������ж��ٸ��̡߳����̿�2������2 x ThreadsPerChild ���̱߳����
-    MinSpareThreads      75         Ĭ����75    
-    MaxSpareThreads      250        Ĭ����250    
+    ServerLimit		500        默认的最大httpd子进程总数是16, 为了加大子进程数量，需要一开始声明最大的子进程数量。
+    ThreadLimit		64         每个子进程的线程默认的最大数量是 64，需要一开始声明最大的线程数量。
+    StartServers          10         一开始启动多少个进程。
+    ThreadsPerChild      20         固定下来每个进程有多少个线程。进程开2，就有2 x ThreadsPerChild 个线程被激活。
+    MinSpareThreads      75         默认是75    
+    MaxSpareThreads      250        默认是250    
     MaxClients          10000
     MaxRequestsPerChild 10000
 
 
 ServerLimit  x  ThreadsPerChild   >=   MaxClients
 
-MaxClients /  ThreadsPerChild  = ����
+MaxClients /  ThreadsPerChild  = 整数
 
 MaxSpareThreads  > =  MinSpareThreads  +  ThreadsPerChild
 
 --------------------------
 
 
-�Ż� mysql  
+优化 mysql  
 
 
 
@@ -606,41 +606,41 @@ http://www.kkvkk.com/178/
 
 
 back_log = 
-Ҫ��MySQL���е���������������ҪMySQL�߳���һ���ܶ�ʱ���ڵõ��ǳ��������������������ã�Ȼ�����̻߳�Щʱ��(���ܺܶ�)������Ӳ����� ��һ�����̡߳�back_logֵָ����MySQL��ʱֹͣ�ش�������֮ǰ�Ķ�ʱ���ڶ��ٸ�������Ա����ڶ�ջ�С�ֻ�����������һ����ʱ�����кܶ��� �ӣ�����Ҫ�����������仰˵����ֵ�Ե�����TCP/IP���ӵ��������еĴ�С����Ĳ���ϵͳ��������д�С�������Լ������ơ���ͼ�趨back_log������Ĳ���ϵͳ�����ƽ�����Ч�ġ�Ĭ����ֵ��50
+要求MySQL能有的连接数量。当主要MySQL线程在一个很短时间内得到非常多的连接请求，这就起作用，然后主线程花些时间(尽管很短)检查连接并且启 动一个新线程。back_log值指出在MySQL暂时停止回答新请求之前的短时间内多少个请求可以被存在堆栈中。只有如果期望在一个短时间内有很多连 接，你需要增加它，换句话说，这值对到来的TCP/IP连接的侦听队列的大小。你的操作系统在这个队列大小上有它自己的限制。试图设定back_log高于你的操作系统的限制将是无效的。默认数值是50
 
 
 skip-networking
-������ѡ����Գ��׹ر�MySQL��TCP/IP���ӷ�ʽ�����WEB����������Զ�����ӵķ�ʽ����MySQL���ݿ��������Ҫ������ѡ������޷��������ӣ�
+开启该选项可以彻底关闭MySQL的TCP/IP连接方式，如果WEB服务器是以远程连接的方式访问MySQL数据库服务器则不要开启该选项！否则将无法正常连接！
 
 
 max_connections = 
-ָ��MySQL������������ӽ�����������ڷ�����̳ʱ��������Too Many Connections�Ĵ����� ʾ������Ҫ����ò���ֵ�� 
+指定MySQL允许的最大连接进程数。如果在访问论坛时经常出现Too Many Connections的错误提 示，则需要增大该参数值。 
 
 
 table_open_cache
 
-5.1.3�汾֮ǰ����  table_cache  �� ָ�������ٻ���Ĵ�С��ÿ��MySQL����һ����ʱ������ڱ��������л��пռ䣬�ñ��ͱ��򿪲��������У��������Ը���ط��ʱ����ݡ�ͨ������ֵʱ��� ״ֵ̬Open_tables��Opened_tables�����Ծ����Ƿ���Ҫ����table_cache��ֵ������㷢��open_tables���� table_cache������opened_tables�ڲ�����������ô�����Ҫ����table_cache��ֵ�ˣ�����״ֵ̬����ʹ��show status like ��Open_tables����ã���ע�⣬����äĿ�ذ�table_cache���óɺܴ��ֵ��������õ�̫�ߣ����ܻ�����ļ����������㣬�Ӷ�������� ���ȶ���������ʧ�ܡ��� MySQL Ĭ�ϰ�װ����£�table_open_cache ��ֵ�� 2G �ڴ����µĻ����е�ֵĬ��ʱ 256MB �� 512MB����������� 4G �ڴ�,��Ĭ�����ֵ�� 2048MB���������ζ�Ż����ڴ�Խ�����ֵӦ��Խ����Ϊ table_open_cache �Ӵ��ʹ�� MySQL �� SQL ��Ӧ���ٶȸ����ˣ����ɱ���Ļ���������������dead lock������������ʹ�����ݿ�����һ�ײ�����������������Ӱ�����ܡ�����ƽʱά���л���Ҫ���ݿ��ʵ�����ȥ�����жϣ��ҵ����ʺ���ά���Ŀ�� 
+5.1.3版本之前叫做  table_cache  ， 指定表高速缓存的大小。每当MySQL访问一个表时，如果在表缓冲区中还有空间，该表就被打开并放入其中，这样可以更快地访问表内容。通过检查峰值时间的 状态值Open_tables和Opened_tables，可以决定是否需要增加table_cache的值。如果你发现open_tables等于 table_cache，并且opened_tables在不断增长，那么你就需要增加table_cache的值了（上述状态值可以使用show status like ‘Open_tables’获得）。注意，不能盲目地把table_cache设置成很大的值。如果设置得太高，可能会造成文件描述符不足，从而造成性能 不稳定或者连接失败。在 MySQL 默认安装情况下，table_open_cache 的值在 2G 内存以下的机器中的值默认时 256MB 到 512MB，如果机器有 4G 内存,则默认这个值是 2048MB，但这决意味着机器内存越大，这个值应该越大，因为 table_open_cache 加大后，使得 MySQL 对 SQL 响应的速度更快了，不可避免的会产生更多的死锁（dead lock），这样反而使得数据库整个一套操作慢了下来，严重影响性能。所以平时维护中还是要根据库的实际情况去作出判断，找到最适合你维护的库的 
 
 
 
 max_allowed_packet
 
-һ���������ߴ硣��Ϣ����������ʼ��Ϊnet_buffer_length�ֽڣ����ǿ�����Ҫʱ���ӵ�max_allowed_packet���ֽڡ�ȱ ʡ�أ���ֵ̫С���ܲ�׽���(���ܴ���)�������������ʹ�ô��BLOB�У���������Ӹ�ֵ����Ӧ��������Ҫʹ�õ����BLOB����ô��mysql�������ݻ���ĳЩ���������ݰ�����16M�ᱨ���������޸ĳɱ���Ҫ����ļ��ܺʹ�
+一个包的最大尺寸。消息缓冲区被初始化为net_buffer_length字节，但是可在需要时增加到max_allowed_packet个字节。缺 省地，该值太小必能捕捉大的(可能错误)包。如果你正在使用大的BLOB列，你必须增加该值。它应该象你想要使用的最大BLOB的那么大。mysql导入数据或者某些操作的数据包大于16M会报错，建议修改成比主要库的文件总和大。
 
 binlog_cache_size
 
-BIN��׺�� LOG�ļ��Ļ��档��һ��������binlogΪ�˼�¼SQL״̬�����е�cache��С 
-# ����㾭��ʹ�ô��,������������,��������Ӵ�ֵ����ȡ���������. 
-# ���д���������״̬������������binlog������Ȼ�����ύ��һ����д�뵽binlog�� 
-# �������ȴ�ֵ��, ��ʹ�ô����ϵ���ʱ�ļ������. 
-# �˻�����ÿ�����ӵ������һ�θ���״̬ʱ������ 
+BIN后缀的 LOG文件的缓存。在一个事务中binlog为了记录SQL状态所持有的cache大小 
+# 如果你经常使用大的,多声明的事务,你可以增加此值来获取更大的性能. 
+# 所有从事务来的状态都将被缓冲在binlog缓冲中然后在提交后一次性写入到binlog中 
+# 如果事务比此值大, 会使用磁盘上的临时文件来替代. 
+# 此缓冲在每个连接的事务第一次更新状态时被创建 
 
 
 
 max_heap_table_size
 
-�������ڴ�����������������. 
-# ��ѡ��Ϊ�˷�ֹ���ⴴ��һ��������ڴ�������������е��ڴ���Դ. 
+独立的内存表所允许的最大容量. 
+# 此选项为了防止意外创建一个超大的内存表导致永尽所有的内存资源. 
 
 
 
@@ -650,7 +650,7 @@ max_heap_table_size
 
 ------------------------
 
-�Ż�PHP 
+优化PHP 
 
 http://blog.lizhigang.net/archives/30
 

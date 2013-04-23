@@ -1,4 +1,4 @@
-﻿Nginx编译安装说明
+Nginx编译安装说明
 
 需要使用的工具及其安装：
 gcc  gcc-c++  make  flex  bison  autoconf  automake  ncurses-devel  vim-enhanced apr-devel  apr-util-devel  curl  curl-devel  

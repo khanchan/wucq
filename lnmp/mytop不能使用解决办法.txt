@@ -1,4 +1,4 @@
 
-ÕÒµ½ÕâÐÐ£º"long|!" => \$config{long_nums},
+æ‰¾åˆ°è¿™è¡Œï¼š"long|!" => \$config{long_nums},
 
-ÐÞ¸ÄÎª£º"long|long_nums|l!" => \$config{long_nums},
+ä¿®æ”¹ä¸ºï¼š"long|long_nums|l!" => \$config{long_nums},

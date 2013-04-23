@@ -2,10 +2,10 @@
 groupadd www
 useradd www -M -g www
 
-### 依赖的libmcrypt 
+### 渚濊禆鐨刲ibmcrypt 
 
 ftp://mcrypt.hellug.gr/pub/crypto/mcrypt/libmcrypt/libmcrypt-2.5.7.tar.gz
-也可以去http://sourceforge.net/projects/mcrypt/files/Libmcrypt/
+涔熷彲浠ュ幓http://sourceforge.net/projects/mcrypt/files/Libmcrypt/
 
 
 /server/php-5.3.23/configure \
