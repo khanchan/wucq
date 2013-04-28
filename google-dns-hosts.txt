@@ -1,3 +1,7 @@
+
+#
+#
+#
 #Google By FGQI
 203.208.46.179 0-focus-opensocial.googleusercontent.com
 203.208.46.179 3hdrrlnlknhi77nrmsjnjr152ueo3soc-a-calendar-opensocial.googleusercontent.com
@@ -220,3 +224,9 @@
 203.208.46.179 qhie5b8u979rnch1q0hqbrmbkn9estf7-a-oz-opensocial.googleusercontent.com
 203.208.46.179 e6ha3snmi09c57cs4h4dnoa006cgfjfu-a-oz-opensocial.googleusercontent.com
 203.208.46.179 66fl6oqbdsqf5fjl032t5iulimtqjhpa-a-oz-opensocial.googleusercontent.com
+
+########################## end google server dns
+#
+#
+
+
