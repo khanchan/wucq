@@ -1,21 +1,80 @@
+﻿
+安装libiconv
 
-groupadd www
-useradd www -M -g www
+cd /opt
+wget http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+tar zxvf libiconv-1.14.tar.gz
+cd libiconv-1.14/
+./configure 
+make
+make install
+ln -s /usr/local/lib/libiconv.so.2 /usr/lib64/libiconv.so.2
+##############################################################################
 
-### 依赖的libmcrypt 
+安装mhash 
 
-ftp://mcrypt.hellug.gr/pub/crypto/mcrypt/libmcrypt/libmcrypt-2.5.7.tar.gz
-也可以去http://sourceforge.net/projects/mcrypt/files/Libmcrypt/
+cd /opt
+wget http://nchc.dl.sourceforge.net/project/mhash/mhash/0.9.9.9/mhash-0.9.9.9.tar.gz
+tar zxvf mhash-0.9.9.9.tar.gz
+cd mhash-0.9.9.9
+./configure
+make
+make install
 
+ln -sf /usr/local/lib/libmhash.a /usr/lib64/libmhash.a
+ln -sf /usr/local/lib/libmhash.la /usr/lib64/libmhash.la
+ln -sf /usr/local/lib/libmhash.so /usr/lib64/libmhash.so
+ln -sf /usr/local/lib/libmhash.so.2 /usr/lib64/libmhash.so.2
+ln -sf /usr/local/lib/libmhash.so.2.0.1 /usr/lib64/libmhash.so.2.0.1
+ldconfig
+##############################################################################
 
-/server/php-5.3.23/configure \
+安装mcrypt 
+
+cd /opt
+wget http://nchc.dl.sourceforge.net/project/mcrypt/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz
+tar xzf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8
+./configure
+make 
+make install
+
+##############################################################################
+# 如果with-imap 则执行以下两行
+
+yum install libc-client-devel.x86_64
+ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.so
+##############################################################################
+
+#groupadd www
+#useradd www -M -s /sbin/nologin -g www
+
+cd /opt
+wget http://cn2.php.net/get/php-5.3.24.tar.gz/from/am1.php.net/mirror
+tar xzf php-5.3.24.tar.gz
+cd php-5.3.24
+
+/opt/php-5.3.24/configure \
 --prefix=/server/php5 \
 --with-config-file-path=/server/php5/etc \
+--disable-ipv6 \
+--disable-debug \
+--disable-cli \
 --enable-fpm \
+--enable-soap \
+--enable-sockets \
+--enable-gd-native-ttf \
+--enable-ftp \
+--enable-mbstring \
+--enable-exif \
+--enable-zend-multibyte \
+--enable-fastcgi \
+--enable-dom \
 --with-fpm-user=www \
 --with-fpm-group=www \
 --with-openssl \
 --with-mysql=/usr/local/mysql \
+--with-pdo-mysql=/usr/local/mysql \
 --with-mysql-sock=/tmp \
 --with-gd \
 --with-jpeg-dir \
@@ -24,27 +83,67 @@ ftp://mcrypt.hellug.gr/pub/crypto/mcrypt/libmcrypt/libmcrypt-2.5.7.tar.gz
 --with-iconv-dir \
 --with-zlib-dir \
 --with-mcrypt \
---enable-soap \
---enable-gd-native-ttf \
---enable-ftp \
---enable-mbstring \
---enable-exif \
---enable-zend-multibyte \
---disable-ipv6 \
---enable-fastcgi \
 --with-pear \
 --with-curl \
 --with-libxml-dir \
+--with-imap \
+--with-imap-ssl \
+--with-kerberos \
+--with-mhash
+
+### 加入链接库
+修改 Makefile 大约77 行左右的地方: EXTRA_LIBS = ..... -lcrypt 在最后加上 -liconv，例如: EXTRA_LIBS = ..... -lcrypt 后面加上 -liconv 然后重新再次 make 即可。
 
 make && make install 
 
-ln -s /server/php5/bin/pear      /usr/local/bin/pear
-ln -s /server/php5/bin/peardev   /usr/local/bin/peardev
-ln -s /server/php5/bin/pecl      /usr/local/bin/pecl
-ln -s /server/php5/bin/phar.phar /usr/local/bin/phar
-ln -s /server/php5/bin/php       /usr/local/bin/php
-ln -s /server/php5/bin/phpize    /usr/local/bin/phpize
-ln -s /server/php5/sbin/php-fpm  /usr/local/sbin/php-fpm
+ln -s /server/php5/bin/pear            /usr/local/bin/pear
+ln -s /server/php5/bin/peardev         /usr/local/bin/peardev
+ln -s /server/php5/bin/pecl            /usr/local/bin/pecl
+ln -s /server/php5/bin/phar.phar       /usr/local/bin/phar
+ln -s /server/php5/bin/php             /usr/local/bin/php
+ln -s /server/php5/bin/phpize          /usr/local/bin/phpize
+ln -s /server/php5/bin/php-config      /usr/local/bin/php-config
+ln -s /server/php5/sbin/php-fpm        /usr/local/sbin/php-fpm
 
-cp /server/php-5.3.23/php.ini-production /server/php5/etc/php.ini
-cp /server/php5/etc/php-fpm.conf.default /server/php5/etc/php-fpm.conf
+cp /opt/php-5.3.24/php.ini-production /server/php5/etc/php.ini
+cp /opt/php-5.3.24/sapi/fpm/php-fpm.conf /server/php5/etc/php-fpm.conf
+cp /opt/php-5.3.24/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+chmod 755  /etc/init.d/php-fpm
+
+chkconfig --add php-fpm
+chkconfig --level 2345 php-fpm on
+
+==========================================================================
+安装 APC
+
+cd /opt
+wget http://pecl.php.net/get/APC-3.1.9.tgz
+tar xzf APC-3.1.9.tgz
+cd APC-3.1.9
+/server/php5/bin/phpize
+./configure --enable-apc --enable-apc-mmap --with-php-config=/server/php5/bin/php-config
+make
+make install
+
+vim /server/php5/etc/php.ini
+
+查找   extension_dir = "./"
+替换为 extension_dir = "/server/php5/lib/php/extensions/no-debug-non-zts-20090626/"
+                  
+
+下面添加 extension = apc.so
+
+配置php.ini 末尾加入
+
+[apc]
+apc.enabled = 1
+apc.shm_size = 512M
+apc.ttl = 86400
+apc.user_ttl = 86400
+apc.num_files_hint = 10000
+apc.user_entries_hint = 10000
+apc.max_file_size = 5M
+apc.stat = 0  #(0是不更新PHP文件）
+
+复制apc.php到网站目录
+mkdir /server/weddingdressbee_net && cp /opt/APC-3.1.9/apc.php /server/weddingdressbee_net
