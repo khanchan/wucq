@@ -1,0 +1,3 @@
+php-fpm.conf
+
+php_flag[display_errors] = on

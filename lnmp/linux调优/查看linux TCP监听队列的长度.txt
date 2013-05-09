@@ -1,0 +1,3 @@
+查看linux TCP监听队列的长度
+
+/proc/sys/net/core/somaxconn 这个参数

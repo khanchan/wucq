@@ -1,0 +1,36 @@
+
+log-error = /server/logs/mysql-error.log
+back_log = 600
+max_connections = 500
+max_connect_errors = 1000
+
+table_open_cache = 4096
+
+query_cache_min_res_unit = 2k
+
+max_heap_table_size = 64M
+
+record_buffer_size = 8M
+read_rnd_buffer_size = 16M
+sort_buffer_size = 8M
+join_buffer_size = 8M
+
+thread_cache_size = 300
+thread_concurrency = 32
+
+query_cache_size = 512M
+query_cache_limit = 2M
+
+default-storage-engine = INNODB
+
+tmp_table_size = 128M
+
+## log-bin=mysql-bin 日志先关闭 二进制日志
+## binlog_format=mixed 
+
+slow_query_log
+long_query_time = 10
+key_buffer_size = 512M 
+
+innodb_buffer_pool_size = 4G
+innodb_flush_log_at_trx_commit = 2  #### 0 也可以 
