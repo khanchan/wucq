@@ -1,8 +1,6 @@
 ﻿
-本文档指导如何在 CentOS-6.*上安装MySQL-5.5.30
-
 准备：
-  MySQL-5.5.30需要用到cmake ：可通过yum -y install cmake 安装；也可以下载源码，自行编译安。
+ yum -y install cmake 
 
 1.安装前首先创建mysql用户
   groupadd mysql
@@ -61,7 +59,6 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
 
 6. 改变权限和初始化mysql 服务器的系统表,
     cd /usr/local/mysql
-    chown -R mysql .
     chgrp -R mysql .
     chown -R root .
     chown -R mysql data
@@ -70,8 +67,7 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
     basedir   = /usr/local/mysql
     datadir   = /usr/local/mysql/data
     log-error = /server/logs/mysql-error.log 
-  新建目录
-  mkdir -p /server/logs
+
 8.开启2345运行级别的自启动（开机自启动）
     chkconfig --add mysqld
     chkconfig --level 2345 mysqld on

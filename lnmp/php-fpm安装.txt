@@ -9,6 +9,7 @@ cd libiconv-1.14/
 make
 make install
 ln -s /usr/local/lib/libiconv.so.2 /usr/lib64/libiconv.so.2
+
 ##############################################################################
 
 安装mhash 
@@ -143,7 +144,8 @@ apc.user_ttl = 86400
 apc.num_files_hint = 10000
 apc.user_entries_hint = 10000
 apc.max_file_size = 5M
-apc.stat = 0  #(0是不更新PHP文件）
+apc.stat = 0  
+#(0是不更新PHP文件）
 
 复制apc.php到网站目录
-mkdir /server/weddingdressbee_net && cp /opt/APC-3.1.9/apc.php /server/weddingdressbee_net
+mkdir /server/www/weddingdressbee_net && cp /opt/APC-3.1.9/apc.php /server/www/weddingdressbee_net

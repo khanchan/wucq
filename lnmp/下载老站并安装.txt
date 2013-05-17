@@ -1,8 +1,8 @@
-﻿1.下载解压
-test -d /server/weddingdressbee_net || mkdir /server/weddingdressbee_net
-cd /server/weddingdressbee_net
+1.下载解压
+test -d /server/www/weddingdressbee_net || mkdir /server/www/weddingdressbee_net
+cd /server/www/weddingdressbee_net
 wget http://www.uniquemix.com/wedding_dress_bee.tar.gz
-tar xvzf wedding_dress_bee.tar.gz 
+tar xzf wedding_dress_bee.tar.gz 
 mv wedding_dress_bee/* .
 
 2.修改 robots.txt 注释掉全部加入两行
@@ -36,5 +36,24 @@ cd /server/weddingdressbee_net/app/design/frontend/mercado/default/template/page
 find . -type f -exec sed -i -e's/weddingdressbee\.net/weddingdressbee\.mobi/g' {} \;
 
 10.更改站点目录、文件的属主及其权限
-chown -R www:www /server/weddingdressbee_net
-chmod -R 755 /server/weddingdressbee_net/var/ /server/weddingdressbee_net/media/
+chown -R www:www /server/www/weddingdressbee_net
+chmod -R 755 /server/www/weddingdressbee_net/var/ /server/weddingdressbee_net/media/
+
+
+###################################################
+###################################################
+###################################################
+###################################################
+以下是一行脚本
+test -d /server/www/weddingdressbee_net || mkdir /server/www/weddingdressbee_net
+cd /server/www/weddingdressbee_net
+wget http://www.uniquemix.com/wedding_dress_bee.tar.gz
+tar xzf wedding_dress_bee.tar.gz 
+mv wedding_dress_bee/* .
+sed -i -e '2 a Disallow: /' -e '3,$ s/^/#/' robots.txt
+for f in cron.php*;do mv $f $f.bak;done;
+unzip wedd_dress_bee0315.sql.zip
+mysql -uroot -pmgtgn123 -e 'create database if not exists weddingdressbee_net; use weddingdressbee_net;source /server/www/weddingdressbee_net/wedd_dress_bee0315.sql;'
+mysql -uroot -pmgtgn123 -e 'grant all privileges on weddingdressbee_net.* to mgt@"localhost" identified by "mgtgn123" ;flush privileges;'
+chown -R www:www /server/www/weddingdressbee_net
+chmod -R 755 /server/www/weddingdressbee_net/var/ /server/www/weddingdressbee_net/media/
