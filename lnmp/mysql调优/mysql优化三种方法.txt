@@ -1,0 +1,118 @@
+任何一位数据库程序员都会有这样的体会：高通信量的数据库驱动程序中，一条糟糕的SQL查询语句可对整个应用程序的运行产生严重的影响，其不仅消耗掉更多的数据库时间，且它将对其他应用组件产生影响。
+　　如同其它学科，优化查询性能很大程度上决定于开发者的直觉。幸运的是，像MySQL这样的数据库自带有一些协助工具。本文简要讨论诸多工具之三种：使用索引，使用EXPLAIN分析查询以及调整MySQL的内部配置。
+　　一、使用索引
+　　MySQL允许对数据库表进行索引，以此能迅速查找记录，而无需一开始就扫描整个表，由此显著地加快查询速度。每个表最多可以做到16个索引，此外MySQL还支持多列索引及全文检索。
+　　给表添加一个索引非常简单，只需调用一个CREATE INDEX命令并为索引指定它的域即可。
+　　这里，对users表的username域做索引，以确保在WHERE或者HAVING子句中引用这一域的SELECT查询语句运行速度比没有添加索引时要快。
+　　值得注意的是：索引就像一把双刃剑。对表的每一域做索引通常没有必要，且很可能导致运行速度减慢，因为向表中插入或修改数据时，MySQL不得不每次都为这些额外的工作重新建立索引。另一方面，避免对表的每一域做索引同样不是一个非常好的主意，因为在提高插入记录的速度时，导致查询操作的速度减慢。这就需要找到一个平衡点，比如在设计索引系统时，考虑表的主要功能(数据修复及编辑)不失为一种明智的选择。
+　　二、优化查询性能
+　　在分析查询性能时，考虑EXPLAIN关键字同样很管用。EXPLAIN关键字一般放在SELECT查询语句的前面，用于描述MySQL如何执行查询操作、以及MySQL成功返回结果集需要执行的行数。
+　　三、调整内部变量
+　　MySQL是如此的开放，所以可轻松地进一步调整其缺省设置以获得更优的性能及稳定性。需要优化的一些关键变量如下：
+　　改变索引缓冲区长度(key_buffer)
+　　一般，该变量控制缓冲区的长度在处理索引表(读/写操作)时使用。MySQL使用手册指出该变量可以不断增加以确保索引表的最佳性能，并推荐使用与系统内存25%的大小作为该变量的值。这是MySQL十分重要的配置变量之一，如果你对优化和提高系统性能有兴趣，可以从改变key_buffer_size变量的值开始。
+　　改变表长(read_buffer_size)
+　　当一个查询不断地扫描某一个表，MySQL会为它分配一段内存缓冲区。read_buffer_size变量控制这一缓冲区的大小。如果你认为连续扫描进行得太慢，可以通过增加该变量值以及内存缓冲区大小提高其性能。
+　　设定打开表的数目的最大值(table_cache)
+　　该变量控制MySQL在任何时候打开表的最大数目，由此能控制服务器响应输入请求的能力。它跟max_connections变量密切相关，增加table_cache值可使MySQL打开更多的表，就如增加max_connections值可增加连接数一样。当收到大量不同数据库及表的请求时，可以考虑改变这一值的大小。
+　　对缓长查询设定一个时间限制(long_query_time)
+　　MySQL带有“慢查询日志”，它会自动地记录所有的在一个特定的时间范围内尚未结束的查询。这个日志对于跟踪那些低效率或者行为不端的查询以及寻找优化对象都非常有用。long_query_time变量控制这一最大时间限定，以秒为单位。
+　　以上讨论并给出用于分析和优化SQL查询的三种工具的使用方法，以此提高你的应用程序性能。
+ 
+一篇非常好的MySQL参数介绍，特别明确一些易混淆的参数(转载)  原文地址：http://www.perfgeeks.com/
+
+MySQL用得比较多的引擎是MyISAM，InnoDB，这里的配置或以InnoDB为主，或以MyISAM为主而论，混合使用配置比较复杂，内 存难以平衡。另外，这些配置都是global变量，而非Per-Connection变量。这些global变量依赖于硬件和存储引擎的使用，而per- connection变量与特定的访问量相关。
+key_buffer_size
+•MyISAM键缓冲。对MyISAM很重要，缓存MyISAM表索引数据。
+•MyISAM只缓存索引数据，概不缓存行数据，行数据交给OS页面缓存(OS page cache)
+•若主要使用myisam，推荐设置可用RAM的20%~50%,更多的内存留给OS，缓存从*.MYD读取的行数据。
+•设置太大，浪费内存空间,设置太小缓存命中率低 
+◦＊du –sch `find /usr/lib/mysql –name “*.MYI”`统计当下索引文件大小。一般，key_buffer_size设置比它大一些即可,写入负载不大的话，大10%就可以。
+◦＊观察高峰期的缓存命中率，以及key buffer使用率
+◦＊1-key_reads/key_read_requests 即是缓存命中率（可达99.99%）
+◦＊key_blocks_unused * key_cache_block_size / key_buffer_size 
+•若主要使用innodb，更多的内存应该分给BP(innodb buffer pool)。
+•即便全是innodb表,没用MyISAM，也有必要设置该值用于缓存临时表之索引，推荐32MB
+innodb_buffer_pool_size
+•Innodb缓冲池(本文简写BP)。对Innodb很重要。
+•Innodb不依赖OS,而自己缓存了所有数据，包括索引数据，行数据，等等。这点跟myisam有差别。
+•应该把它设置得大一些，建议设置为可用RAM的70~80%。
+•大虽好，但不要过于太大。 
+◦＊查询或更新需要对BP加锁，影响并发 
+◦＊BP有一块buffer用于插入缓冲。在插入的时候，先写入内存，之后再合并后顺序写入磁盘。在命并到磁盘上的时候，会引发较大的IO操作，对实时操作造成影响(看上去是抖动,tps变低)
+◦＊查看BP状态(show status like ‘innodb_buffer_pool_%’)，单位是page(16kb),尤其是Innodb_buffer_pool_wait_free要小。
+•Mysql会定时(每10s)将脏页刷新到磁盘，或100页或10页。
+•要是脏页太多，超过了指定数量(参见innodb_max_dirty_pages_pct),Mysql则会每秒刷100页脏页。
+innodb_log_file_size
+•事物日志文件大小，即redo log文件大小。
+•InnoDB默认一组2个redo log文件，以环结构写入。
+•变量innodb_log_files_in_groups指定redo log文件数量。不宜太多，一般2~3个redo log文件。
+•Redo log文件写满后，会将部分drity page同步到磁盘。可以观察Innodb_log_waits值
+•根据服务器负载，推荐选择设置64-512MB,可以是BP的25%。
+•值越大，也就更少的checkpoint，更好的性能,但恢复时间较长。如此，高写入负载，尤其是大数据集，它对性能影响较大
+innodb_log_buffer_size
+•Redo log缓冲区，单位不是page(16kb)
+•默认大小为8M，可以应付中等强度写入负载。要是更新操作峰值或者负载较大，应该加大该值，推荐8-16MB。
+•过大的设置该值，会浪费内存空间。redo log只在这片内存区至多大约暂停1秒,就被刷至磁盘。
+•Mysql每隔1秒和10秒会刷新redo log至磁盘
+•每60秒观察Innodb_os_log_written值，60s是一个经验值。
+•每次事物commit时，mysql默认将redo log刷新至磁盘。参见innodb_flush_log_at_trx_commit参数。
+innodb_flush_log_at_trx_commit
+•事物commit时，mysql对redo log buffer的操作。
+•三个可选值0,1,2 
+◦＊ 0 啥都不做，不write()，也不fsync()。
+◦＊ 1 同步IO,确定将redo log同步写入磁盘，即write()，又fsync()。也是mysql默认值。
+◦＊ 2 只write()，不fsync()，即不确认写入磁盘，可能还在OS page cache
+•默认值1,确保了,但给mysql带来较大的I/O压力。推荐设置2
+•同步IO，调用fsync()，还是设置open()的O_SYNC，参见innodb_flush_method
+innodb_flush_method
+•Innodb数据刷新(flush)的方法。
+•可选取值有Fdatasync, O_DSYNC, O_DIRECT 
+◦＊Fdatasync
+调用open(“./ib_logfile0”, …)，不设置O_SYNC, 但调用fsync()
+调用open(“./ibdata1”, …)，不设置O_SYNC, 但调用fsync()
+◦＊O_DSYNC,
+调用open(“./ib_logfile0”, …)，设置O_SYNC, 不调用fsync()
+调用open(“./ibdata1”, …)，不设置O_SYNC,但调用fsync()
+◦＊O_DIRECT
+调用open(“./ib_logfile0”, …)，不设置O_DIRECT, 调用fsync()
+调用open(“./ibdata1”, …)，设置O_DIRECT,调用fsync()
+•取值O_DIRECT，不影响ib_logfile*，但影响ibdata＊，通过调用fcntl()给ibdata*文件设置O_DIRECT标志。该值意味跳过OS页面缓存。
+•取值O_DSYNC,并不影响ibdata＊，但影响ib_logfile*文件。该值意味着,每个write()调用直到I/O操作完成后才返回，故会阻塞调用过程。
+sync_binlog
+•决定Innodb同步bin log至磁盘的频率。对性能影响大…
+•默认值是0。不调用fsync()，依赖于OS调度。
+•设置值1,较高的安全性，但代价也高。每次commit，都要求进行一次fsync()同步I/O操作。
+•若每次commit，都进行二次fsync(),分别是redo log与bin log，访问不同的磁盘位置，较慢的磁盘搜索。
+•若值大于0，则表示每sync_binlog次commit，进行一次fsync()调用，同步binlog。
+•设置innodb_support_xa=0, 禁用xa支持。
+innodb_doublewrite
+•innodb双写缓冲，为了避免Partial Page Writes
+•Innodb每次同步脏页到磁盘时，先将脏页同步到doubwrite buffer，再择机将数据拷贝到实际位置。
+•doublewrite buffer，是innodb表空间一块区域，即在磁盘，而非在内存。
+•损失较小的性能，大概在5%~10%
+•设置0值关闭innodb_doublewrite功能，不过不建这么设置。
+•观察(show status like ‘innodb_dblwr_%’) 
+◦＊ innodb_dblwr_pages_written
+◦＊ innodb_dblwr_writes
+thread_cache_size
+•定义了连接thread缓存数目,保存了和当前连接无关的thread。 
+•MySQL总是先从thread cache中满足连接请求，直到不够用（线程缓存空了），才新建thread。 
+•每次断开连接，MySQL总会回收thread，放入thread cache，以供接下来的请求使用。 
+•新建thread与销毁thread，代价都挺高,应该尽量缓存之。 
+•观察Threads_created值，新建线程不宜多，若多时应该考滤加大thread_cache_size值 
+•每个在缓存中的线程通常占用256KB内存。 
+•每个连接线程创建的时候，mysql会给它创建thread_stack这么多内存。 
+table_cache
+•表缓存,存储了能表示表的对象。打开表的开销可能不小，尽量缓存之。
+•MySQL5.1,表缓存分为2部分 
+◦＊table_open_cache (per-connection)
+◦＊table_definition_cache (global)
+•变量table_definition_cache比较好设置，把它设置得足够大，大到可以缓存所有表定义(*.frm)。
+•持续观察Opened_tables的值，若值很大或者一直保持上升，应考滤加大table_open_cache，加大表缓存。
+•较大的table_cache(table_open_cache),使得mysql占用较大的文件描述符，需要设置open_files_limit，以及通过命令ulimit -n开大max open files。 
+•每个线程都需要打开表，所以，可以把table_open_cache设置得大一些，它没有太大的坏处(影响不大)。 
+◦＊参考打开表的数量
+◦＊参考max_connections(Connections)
+◦＊Peter说他见过有人将该值设置为100,000。
+query_cache_size

@@ -1,0 +1,55 @@
+#################  Google 开发的 gperftools 包含四个工具，分别是：TCMalloc、heap-checker、heap-profiler 和 cpu-profiler
+#################  TCMalloc是 gperftools 的其中一个工具，用于优化C++写的多线程应用，与标准的glibc库的malloc相比，TCMalloc在内存的分配效率和速度要高，可以在高并发的情况下很好的控制内存的使用，提高服务器的性能，降低负载。
+#################  使用 TCMalloc 优化 Nginx 和 MySQL 的内存管理，性能将会有一定程度的提升，特别是对MYSQL服务器高并发下情况下的性能。
+#################  安装 libunwind 库
+#################  如果系统是64位的需要先安装libunwind库，32位系统则不需要安装。
+#################  libunwind 库为基于64位CPU和操作系统的程序提供了基本的堆栈辗转开解功能，其中包括用于输出堆栈跟踪的API、用于以编程方式辗转开解堆栈的API以及支持C++异常处理机制的API。
+
+wget http://download.savannah.gnu.org/releases/libunwind/libunwind-1.0.1.tar.gz
+tar -zxvf libunwind-1.0.1.tar.gz
+cd libunwind-1.0.1/
+CFLAGS=-fPIC ./configure
+make CFLAGS=-fPIC
+make CFLAGS=-fPIC install
+cd ../
+
+#################  gperftools 的安装
+#################  gperftools 项目网站 http://code.google.com/p/gperftools/
+
+wget http://gperftools.googlecode.com/files/gperftools-2.0.tar.gz
+tar -zxvf gperftools-2.0.tar.gz
+cd gperftools-2.0
+./configure --prefix=/usr/local --enable-frame-pointers
+make
+make install
+cd ../
+
+#################  如果是32位系统,可以不添加 –enable-frame-pointers
+#################  如果是64位系统，并且之前没有安装libunwind，那么一定要添加 –enable-frame-pointers 参数。
+
+echo "/usr/local/lib" > /etc/ld.so.conf.d/usr_local_lib.conf
+/sbin/ldconfig
+
+#################  为 gperftools 添加线程目录:
+
+mkdir /tmp/tcmalloc
+chmod 0777 /tmp/tcmalloc
+
+#################  使用gperftools优化Nginx：
+#################  为了使 Nginx 支持 gperftools，增加参数 –with-google_perftools_module 重新编译Nginx。
+#################  修改/usr/local/nginx/conf/nginx.conf
+#################  在pid这行的下面添加
+
+google_perftools_profiles /tmp/tcmalloc;
+
+#################  重新启动nginx
+#################  使用gperftools优化MYSQL：
+#################  查找文件 /usr/local/mysql/bin/mysqld_safe
+#################  在# executing mysqld_safe 下面加上
+
+export LD_PRELOAD=/usr/local/lib/libtcmalloc.so
+
+#################  重新启动MYSQL
+#################  验证 tcmalloc 是否运行：
+
+lsof -n | grep tcmalloc

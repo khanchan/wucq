@@ -1,0 +1,5 @@
+警告：在 Linux x86 上必须小心不能将内存使用设置太高， glibc 会把进程堆增长到线程堆栈之上，这将会使服务器崩溃。下面的接近或超过于 2G 将会很危险： 
+
+innodb_buffer_pool_size + key_buffer +
+    max_connections * (sort_buffer + record_buffer) + max_connections * 2 MB
+

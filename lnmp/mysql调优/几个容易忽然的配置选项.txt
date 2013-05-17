@@ -1,0 +1,19 @@
+MyISAM在读操作占主导的情况下是很高效的。可一旦出现大量的读写并发，同InnoDB相比，MyISAM的效率就会直线下降，而且，MyISAM和InnoDB的数据存储方式也有显著不同：通常，在MyISAM里，新数据会被附加到数据文件的结尾，可如果时常做一些UPDATE，DELETE操作之后，数据文件就不再是连续的，形象一点来说，就是数据文件里出现了很多洞洞，此时再插入新数据时，按缺省设置会先看这些洞洞的大小是否可以容纳下新数据，如果可以，则直接把新数据保存到洞洞里，反之，则把新数据保存到数据文件的结尾。之所以这样做是为了减少数据文件的大小，降低文件碎片的产生。但InnoDB里则不是这样，在InnoDB里，由于主键是cluster的，所以，数据文件始终是按照主键排序的，如果使用自增ID做主键，则新数据始终是位于数据文件的结尾。
+了解了这些基础知识，下面说说MyISAM几个容易忽视的配置选项：
+concurrent_insert：
+通常来说，在MyISAM里读写操作是串行的，但当对同一个表进行查询和插入操作时，为了降低锁竞争的频率，根据concurrent_insert的设置，MyISAM是可以并行处理查询和插入的：
+当concurrent_insert=0时，不允许并发插入功能。
+当concurrent_insert=1时，允许对没有洞洞的表使用并发插入，新数据位于数据文件结尾（缺省）。
+当concurrent_insert=2时，不管表有没有洞洞，都允许在数据文件结尾并发插入。
+这样看来，把concurrent_insert设置为2是很划算的，至于由此产生的文件碎片，可以定期使用OPTIMIZE TABLE语法优化。
+max_write_lock_count：
+缺省情况下，写操作的优先级要高于读操作的优先级，即便是先发送的读请求，后发送的写请求，此时也会优先处理写请求，然后再处理读请求。这就造成一个问题：一旦我发出若干个写请求，就会堵塞所有的读请求，直到写请求全都处理完，才有机会处理读请求。此时可以考虑使用max_write_lock_count：
+max_write_lock_count=1
+有了这样的设置，当系统处理一个写操作后，就会暂停写操作，给读操作执行的机会。
+low-priority-updates：
+我们还可以更干脆点，直接降低写操作的优先级，给读操作更高的优先级。
+low-priority-updates=1
+综合来看，concurrent_insert=2是绝对推荐的，至于max_write_lock_count=1和low-priority-updates=1，则视情况而定，如果可以降低写操作的优先级，则使用low-priority-updates=1，否则使用max_write_lock_count=1。
+
+
+出处 ： http://ourmysql.com/archives/564
