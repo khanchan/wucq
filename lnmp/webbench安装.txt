@@ -1,0 +1,6 @@
+
+cd /opt
+wget -c http://home.tiscali.cz/cz210552/distfiles/webbench-1.5.tar.gz
+tar xzf webbench-1.5.tar.gz
+cd webbench-1.5 
+make && make install

@@ -188,19 +188,19 @@ cd bfd-1.5
 
 
 
-   yum install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel gd-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
+   yum -y install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel gd-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
 
 
 
-   yum install ntp libc-client-devel vim-enhanced curl  gettext-devel apr-devel apr-util-devel  gmp-devel pspell-devel  pam-devel libtiff-devel  libjpeg-devel  libmcrypt-devel freetype libevent* libtool
+   yum -y install ntp libc-client-devel vim-enhanced curl  gettext-devel apr-devel apr-util-devel  gmp-devel pspell-devel  pam-devel libtiff-devel  libjpeg-devel  libmcrypt-devel freetype libevent* libtool
 
 
 
-   yum install perl-Net-SSLeay perl-Crypt-SSLeay perl-DBI perl-DBD-MySQL
+   yum -y install perl-Net-SSLeay perl-Crypt-SSLeay perl-DBI perl-DBD-MySQL
 
 
 
-   yum install apr*  curl-devel  openssl openssl-devel pcre-devel gd kernel keyutils perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-libs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel libXpm*  libjpeg* libpng* php-common php-gd ncurses* libtool* libxml2  patch
+   yum -y install apr*  curl-devel  openssl openssl-devel pcre-devel gd kernel keyutils perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-libs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel libXpm*  libjpeg* libpng* php-common php-gd ncurses* libtool* libxml2  patch
 
 
 
@@ -211,6 +211,8 @@ cd bfd-1.5
 
 
     yum remove httpd php
+
+    rm -f  /etc/php.ini
 
 
 
@@ -241,7 +243,7 @@ c4="\[\e[34m\]"
 c5="\[\e[35m\]"
 c6="\[\e[36m\]"
 c7="\[\e[37m\]"
-PS1="$c1\u$c2@\h$c3[\t]$c4[no:\!]$5$c6[pwd:\w]$c7$c1\n$c2>";
+PS1='$c1\u$c2@\h$c3[\t]$c4[no:\!]$c5$c6[pwd:\w]$c7$c1\n$c2>';
 export PAGER=less
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
@@ -251,7 +253,6 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 EOF
-
 
 vim /etc/vimrc
 

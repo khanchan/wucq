@@ -13,7 +13,6 @@ for f in cron.php*;do mv $f $f.bak;done;
 
 4.解压数据库
 unzip wedd_dress_bee0315.sql.zip
-#sed -i -e 's/weddingdressbee\.net/weddingdressbee\.mobi/g' wedd_dress_bee0315.sql
 
 5.新建数据库，并导入老站的数据
 mysql -uroot -pmgtgn123 -e 'create database if not exists weddingdressbee_net; use weddingdressbee_net;source /server/weddingdressbee_net/wedd_dress_bee0315.sql;'

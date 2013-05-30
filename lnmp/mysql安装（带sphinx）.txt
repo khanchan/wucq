@@ -1,4 +1,5 @@
 ﻿
+
 准备：
  yum -y install cmake 
 
@@ -12,10 +13,17 @@
   cd /opt
   wget -c http://downloads.mysql.com/archives/mysql-5.5/mysql-5.5.30.tar.gz
   tar zxvf mysql-5.5.30.tar.gz
+  
+  2.1 添加sphinx插件
+    cd /opt
+    wget -c http://sphinxsearch.com/files/sphinx-2.0.8-release.tar.gz
+    tar xzf sphinx-2.0.8-release.tar.gz 
+    cd /opt/sphinx-2.0.8-release
+    mkdir -p /opt/mysql-5.5.30/storage/sphinx && cp -R /opt/sphinx-2.0.8-release/mysqlse/*  /opt/mysql-5.5.30/storage/sphinx
 
 3.配置编译选项 [ccmake . 命令可以查看所有有选项 h 键可以打开帮助]
 
-cd /opt/mysql-5.5.30
+cd /opt/mysql-5.5.30 
 
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
 -DMYSQL_UNIX_ADDR=/tmp/mysqld.sock \
@@ -30,7 +38,8 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
 -DWITH_EMBEDDED_SERVER=1 \
 -DENABLED_LOCAL_INFILE=1 \
 -DWITH_SSL=yes \
--DWITH_DEBUG=0
+-DWITH_DEBUG=0 \
+-DWITH_SPHINX_STORAGE_ENGINE=1
 
 说明：
 MYSQL_UNIX_ADDR                 socket文件的路径
@@ -42,6 +51,7 @@ WITH_MYISAM_STORAGE_ENGINE      开启MYISAM引擎
 WITH_INNOBASE_STORAGE_ENGINE    开启INNOBASE引擎
 WITH_READLINE                   使用READLINE库（注-1）
 WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的代码 , system是使用系统中已安装的版本
+WITH_SPHINX_STORAGE_ENGINE=1    开启sphinx引擎
 
 -DWITHOUT_PARTITION_STORAGE_ENGINE=1 \  ### 效果不明
 
@@ -87,8 +97,8 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
 10.初始数据库
     cd /usr/local/mysql/
     scripts/mysql_install_db --user=mysql
-    bin/mysqld_safe --user=mysql &
-    
+       #### bin/mysqld_safe --user=mysql & ######可用service 直接启动 如果要添加tcmalloc支持 转到12步
+    service mysqld start
     service mysqld stop 
     service mysqld start
     service mysqld restart
@@ -99,6 +109,9 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
 11.检查安装模块
     mysql -u root -pmgtgn123 -e 'SHOW variables like "have_%";'
 
+    mysql -u root -pmgtgn123 -e 'install plugin sphinx soname "ha_sphinx.so";'
+    mysql -u root -pmgtgn123 -e 'show engines;'
+
 12.添加tcmalloc支持
   查找文件 /usr/local/mysql/bin/mysqld_safe
   在# executing mysqld_safe 这行下面加上
@@ -108,3 +121,4 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
   重新启动MYSQL
   验证 tcmalloc 是否运行：
   lsof -n | grep tcmalloc
+

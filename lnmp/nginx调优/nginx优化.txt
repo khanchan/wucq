@@ -13,8 +13,10 @@ fastcgi_cache_min_uses 1; 缓存在fastcgi_cache_path 指令inactive 参数值�
 fastcgi_cache_use_stale error timeout invalid_headerhttp_500; 不知道这个参数的作用，猜想应该是让nginx 知道哪些类型的缓存是没用的。以上为nginx 中FastCGI相关参数，另外，FastCGI 自身也有一些配置需要进行优化，
 
 如果你使用php-fpm来管理FastCGI，可以修改配置文件中的以下值： 
+
 max_children 60
 同时处理的并发请求数，即它将开启最多60 个子线程来处理并发连接。 
+
 rlimit_files 102400
 最多打开文件数
 

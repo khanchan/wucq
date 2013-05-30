@@ -21,7 +21,7 @@ session    required   pam_limits.so
 设置需要被限制的用户名，组名前面加@和用户名区别。也可用通配符*来做所有用户的限制
 
 2）type
-类型有soft，hard 和 -，其中soft 指的是当前系统生效的设置值。hard 表明系统中所能设定的最大值。soft 的限制不能比har 限制高。用 - 就表明同时设置了soft 和hard的值
+类型有soft，hard 和 -，其中soft 指的是当前系统生效的设置值。hard 表明系统中所能设定的最大值。soft 的限制不能比hard 限制高。用 - 就表明同时设置了soft 和hard的值
 
 3）resource： 表示要限制的资源
 

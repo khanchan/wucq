@@ -1,5 +1,6 @@
 ﻿
-需要先安装gperftools 
+如果要带上 --with-google_perftools_module  需要先安装gperftools 
+安装方法见 : 《使用gperftools优化Nginx和MySQL内存管理.txt》
 
 1.为nginx建组和用户（nginx以独立的账户和组运行可以方便管理）
   groupadd www
@@ -7,24 +8,22 @@
 
 2.获取nginx => http://nginx.org/en/download.html (下载稳定版本1.4.1)
   cd /opt
-  wget http://nginx.org/download/nginx-1.4.1.tar.gz
+  wget -c http://nginx.org/download/nginx-1.4.1.tar.gz
 
 3. 解压
   tar xzf nginx-1.4.1.tar.gz
   cd nginx-1.4.1
 
 4. configure
-  /opt/nginx-1.4.1/configure --user=www --group=www --http-log-path=/server/logs/nginx_access.log --error-log-path=/server/logs/nginx_error.log --with-http_ssl_module --with-http_flv_module --with-http_sub_module --with-http_stub_status_module --with-http_dav_module --with-http_gzip_static_module --with-http_realip_module --with-file-aio --with-cpu-opt=opteron --with-cc-opt='-O3'
+  /opt/nginx-1.4.1/configure --user=www --group=www --http-log-path=/server/logs/nginx_access.log --error-log-path=/server/logs/nginx_error.log --with-http_ssl_module --with-http_flv_module --with-http_sub_module --with-http_stub_status_module --with-http_dav_module --with-http_gzip_static_module --with-http_realip_module --with-file-aio --with-cpu-opt=opteron --with-cc-opt='-O3' --with-google_perftools_module
 
-  make
-  make install
+  make -j 8 && make install
 
 5. 查看nginx是否在path中。
-  which nginx 
-  ln -s /usr/local/nginx/sbin/nginx  /usr/bin/nginx
+  ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
 
 6. 设定启动脚本
-vim /etc/init.d/nginx    写入以下内容
+  vim /etc/init.d/nginx    写入以下内容
 
 #!/bin/bash
 ### BEGIN INIT INFO 
@@ -121,5 +120,10 @@ exit $RETVAL
 
 chmod +x /etc/init.d/nginx
 chkconfig --add nginx
+chkconfig nginx on
 
 service nginx start
+service nginx stop
+service nginx start
+service nginx restart
+  
