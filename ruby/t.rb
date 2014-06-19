@@ -9,7 +9,7 @@ def fc(n=1)
 		n * fc(n-1)
 	end
 end
-################### addddd
+################### addddd for test !!!!
 =begin  
 puts fc(40)
 =end
