@@ -9,8 +9,8 @@ def fc(n=1)
 		n * fc(n-1)
 	end
 end
-
-=begin 
+################### addddd
+=begin  
 puts fc(40)
 =end
 #puts fc()
