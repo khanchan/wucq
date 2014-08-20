@@ -1,5 +1,6 @@
 set fenc=utf-8
-set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
+set fencs=usc-bom,utf-8,euc-jp,gb18030,gbk,gb2312,cp936
+set encoding=utf-8
 
 " 不要使用vi的键盘模式，而是vim自己的
 set nocompatible
