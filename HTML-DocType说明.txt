@@ -1,6 +1,6 @@
-<!doctype html>
+﻿<!doctype html>
 
-1.所有浏览器都支持 <!DOCTYPE> 声明。
+1.所有浏览器都支持 <!DOCTYPE> 声明。 
 2.<!DOCTYPE> 声明必须是 HTML 文档的第一行，位于 <html> 标签之前。
 3.<!DOCTYPE> 声明不是 HTML 标签；它是指示 web 浏览器关于页面使用哪个 HTML 版本进行编写的指令。
 4.在 HTML 4.01 中，<!DOCTYPE> 声明引用 DTD，因为 HTML 4.01 基于 SGML。
