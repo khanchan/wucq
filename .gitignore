@@ -1,2 +1,3 @@
-wcq.txt
-c.txt
+*.bak
+*.tmp
+*.cache
