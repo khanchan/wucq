@@ -1,15 +1,17 @@
 <?php
-
-$host = 'localhos';
-$port = 3308;
+$host = 'localhost';
+$port = 3306;
 $dbname = 'test';
 $dbuser = 'root';
-$dbpwd  = 'wcq537';
+$dbpwd  = 'pwddd';
 $dns    = "mysql:host=$host;port=$port;dbname=$dbname";
 try{
     $pdo = new PDO($dns , $dbuser , $dbpwd);
-    $con = $pdo->prepare('select * from user' );
-    $result = $con->execute();
+    $con = $pdo->prepare('select * from user where password <> ?');
+    $con->execute(array('password2'));
+    $result = $con->fetchAll();
+
+
 
     foreach($result as $record){
         echo $record['password'] , "\n";
