@@ -1,4 +1,4 @@
-
+﻿
 安装libiconv
 
 cd /opt
@@ -54,6 +54,7 @@ wget -c http://cn2.php.net/get/php-5.3.24.tar.gz/from/am1.php.net/mirror
 tar xzf php-5.3.24.tar.gz
 cd php-5.3.24
 
+##### 注意这里有一行 --disable-cli 
 /opt/php-5.3.24/configure \
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php/etc \
