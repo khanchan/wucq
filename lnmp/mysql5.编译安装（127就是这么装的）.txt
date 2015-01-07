@@ -1,4 +1,4 @@
-1.安装所需软件
+﻿1.安装所需软件
 yum install gcc gcc-c++ ncurses ncurses-devel openssl openssl-devel bison
 
 2.下载安装cmake（MySQL5.5.x版本改为跨平台的cmake编译）
@@ -47,8 +47,7 @@ rm -f CMakeCache.txt
 #### 当编译，安装完成后。
 #### 去安装目录，初始化mysql 服务器的系统表
 cd /usr/local/mysql
-chown -R mysql .
-chgrp -R mysql .
+chown -R mysql:mysql .
 scripts/mysql_install_db --user=mysql
 chown -R root .
 chown -R mysql data

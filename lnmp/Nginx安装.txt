@@ -3,28 +3,40 @@
 安装方法见 : 《使用gperftools优化Nginx和MySQL内存管理.txt》
 
 1.为nginx建组和用户（nginx以独立的账户和组运行可以方便管理）
-  groupadd www
-  useradd -M -s /sbin/nologin -g www www
+   groupadd www && useradd -M -s /sbin/nologin -g www www
 
-2.获取nginx => http://nginx.org/en/download.html (下载稳定版本1.4.1)
-  cd /opt
-  wget -c http://nginx.org/download/nginx-1.4.1.tar.gz
+2.获取nginx => http://nginx.org/en/download.html (下载稳定版本1.6.2)
+  cd /opt && wget -c http://nginx.org/download/nginx-1.6.2.tar.gz
 
 3. 解压
-  tar xzf nginx-1.4.1.tar.gz
-  cd nginx-1.4.1
+  tar xzf nginx-1.6.2.tar.gz && cd nginx-1.6.2
 
 4. configure
-  /opt/nginx-1.4.1/configure --user=www --group=www --http-log-path=/server/logs/nginx_access.log --error-log-path=/server/logs/nginx_error.log --with-http_ssl_module --with-http_flv_module --with-http_sub_module --with-http_stub_status_module --with-http_dav_module --with-http_gzip_static_module --with-http_realip_module --with-file-aio --with-cpu-opt=opteron --with-cc-opt='-O3' --with-google_perftools_module
+/opt/nginx-1.6.2/configure \
+--user=www \
+--group=www \
+--http-log-path=/server/logs/nginx_access.log \
+--error-log-path=/server/logs/nginx_error.log \
+--with-http_ssl_module \
+--with-http_flv_module \
+--with-http_sub_module \
+--with-http_stub_status_module \
+--with-http_dav_module \
+--with-http_gzip_static_module \
+--with-http_realip_module \
+--with-file-aio \
+--with-cpu-opt=opteron \
+--with-cc-opt='-O3' \
+--with-google_perftools_module  ####这行可以加入 如果使用google_perftools_module
 
   make -j 8 && make install
 
 5. 查看nginx是否在path中。
-  ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
+ [ -f /usr/sbin/nginx ] || ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
 
-6. 设定启动脚本
-  vim /etc/init.d/nginx    写入以下内容
+6. 设定启动脚本   写入以下内容
 
+cat <<'EOF' > /etc/init.d/nginx
 #!/bin/bash
 ### BEGIN INIT INFO 
 # Provides: Nginx-php-fpm(fastcgi) 
@@ -116,14 +128,12 @@ status)
 esac
 exit $RETVAL
 
-########################################################### 结束 /etc/init.d/nginx
+######### 结束 /etc/init.d/nginx
+
+EOF
 
 chmod +x /etc/init.d/nginx
-chkconfig --add nginx
-chkconfig nginx on
+chkconfig --add nginx && chkconfig nginx on
 
-service nginx start
-service nginx stop
-service nginx start
-service nginx restart
+which nginx && nginx -t && service nginx restart && service nginx stop && service nginx start && service nginx reload
   

@@ -1,8 +1,8 @@
 ﻿
-准备：
- yum -y install cmake 
+准备：(如果之前有安装过了就不需要安装)
+  yum -y install cmake 
 
-1.安装前首先创建mysql用户
+1.安装前首先创建mysql用户 （CentOS-6.5如果有自带的mysql应该就有mysql用户所以不需要添加）
   groupadd mysql
   useradd -M -d /var/lib/mysql -s /sbin/nologin -g mysql mysql
   ### -d 指定shell（该shell不可交互） 
@@ -52,12 +52,11 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
 
    make -j 16 && make install
 
-5.复制配置文件
+5.复制配置文件【在复制之前先确认一下是不是以及存在这个文件了】
     
-    rm -f /etc/my.cnf
-    rm -f /etc/init.d/mysqld
-    cp /opt/mysql-5.5.30/support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
-    cp /opt/mysql-5.5.30/support-files/mysql.server /etc/init.d/mysqld
+    [ -f  /etc/my.cnf ]        || cp /opt/mysql-5.5.30/support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
+    [ -f  /etc/init.d/mysqld ] || cp /opt/mysql-5.5.30/support-files/mysql.server /etc/init.d/mysqld
+
     chmod 755 /etc/init.d/mysqld
 
 6. 改变权限和初始化mysql 服务器的系统表,
@@ -78,11 +77,11 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
     chkconfig --level 2345 mysqld on
 
 9.创建软连接
-    ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
-    ln -s /usr/local/mysql/bin/mysqladmin /usr/bin/mysqladmin
-    ln -s /usr/local/mysql/bin/mysqldump /usr/bin/mysqldump
-    ln -s /usr/local/mysql/bin/mysqlimport /usr/bin/mysqlimport
-    ln -s /usr/local/mysql/bin/mysqlshow /usr/bin/mysqlshow
+    [ -f /usr/local/bin/mysql ]      || ln -s /usr/local/mysql/bin/mysql       /usr/local/bin/mysql
+    [ -f /usr/local/bin/mysqladmin ] || ln -s /usr/local/mysql/bin/mysqladmin  /usr/local/bin/mysqladmin
+    [ -f /usr/local/bin/mysqldump ]  || ln -s /usr/local/mysql/bin/mysqldump   /usr/local/bin/mysqldump
+    [ -f /usr/local/bin/mysqlimport ]|| ln -s /usr/local/mysql/bin/mysqlimport /usr/local/bin/mysqlimport
+    [ -f /usr/local/bin/mysqlshow ]  || ln -s /usr/local/mysql/bin/mysqlshow   /usr/local/bin/mysqlshow
 
 10.初始数据库
     cd /usr/local/mysql/
