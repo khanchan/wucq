@@ -54,7 +54,8 @@ wget -c http://cn2.php.net/get/php-5.4.36.tar.gz/from/am1.php.net/mirror
 tar xzf php-5.4.36.tar.gz
 cd php-5.4.36
  
-/opt/php-5.4.36/configure \
+## 在configure之前清空一下。
+/opt/php-5.4.36/buildconf --force && /opt/php-5.4.36/configure \
 --prefix=/usr/local/php \
 --with-config-file-path=/usr/local/php/etc \
 --disable-ipv6 \
@@ -66,14 +67,13 @@ cd php-5.4.36
 --enable-ftp \
 --enable-mbstring \
 --enable-exif \
---enable-zend-multibyte \
---enable-fastcgi \
 --enable-dom \
 --with-fpm-user=www \
 --with-fpm-group=www \
 --with-openssl \
 --with-mysql=/usr/local/mysql \
---with-pdo-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
 --with-mysql-sock=/tmp \
 --with-gd \
 --with-jpeg-dir \
@@ -88,7 +88,20 @@ cd php-5.4.36
 --with-imap \
 --with-imap-ssl \
 --with-kerberos \
---with-mhash
+--with-mhash \
+--enable-cli \
+
+php-5.3之后可使用zend引擎自带【无须安装】的mysql驱动比较高效。
+最关键的是如果用老的libmysql的方式一定要求安装mysql-lib。
+--with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
+这三行转为 :
+--with-mysql=mysqlnd \
+--with-mysqli=mysqlnd \
+--with-pdo-mysql=mysqlnd \
+
+make -j 4 ZEND_EXTRA_LIBS='-liconv'
 
 ### 加入链接库
 修改 Makefile 
@@ -96,21 +109,28 @@ cd php-5.4.36
 例如: EXTRA_LIBS = ..... -lcrypt 后面加上 -liconv
 然后重新再次 make 即可。
 
-make -j 16  && make install 
+### 如果前面没有加 -liconv 这里必须加 make 参数 make -j 4 ZEND_EXTRA_LIBS='-liconv'
+make -j 16  && make install   
 
-[ -f /usr/local/bin/pear       ] || ln -s /usr/local/php/bin/pear       /usr/local/bin/pear
-[ -f /usr/local/bin/peardev    ] || ln -s /usr/local/php/bin/peardev    /usr/local/bin/peardev
-[ -f /usr/local/bin/pecl       ] || ln -s /usr/local/php/bin/pecl       /usr/local/bin/pecl
-[ -f /usr/local/bin/phar       ] || ln -s /usr/local/php/bin/phar.phar  /usr/local/bin/phar
-[ -f /usr/local/bin/php        ] || ln -s /usr/local/php/bin/php        /usr/local/bin/php
-[ -f /usr/local/bin/phpize     ] || ln -s /usr/local/php/bin/phpize     /usr/local/bin/phpize
-[ -f /usr/local/bin/php-config ] || ln -s /usr/local/php/bin/php-config /usr/local/bin/php-config
-[ -f /usr/local/sbin/php-fpm   ] || ln -s /usr/local/php/sbin/php-fpm   /usr/local/sbin/php-fpm
+ln -s /usr/local/php/bin/pear       /usr/local/bin/pear
+ln -s /usr/local/php/bin/peardev    /usr/local/bin/peardev
+ln -s /usr/local/php/bin/pecl       /usr/local/bin/pecl
+ln -s /usr/local/php/bin/phar.phar  /usr/local/bin/phar
+ln -s /usr/local/php/bin/php        /usr/local/bin/php
+ln -s /usr/local/php/bin/phpize     /usr/local/bin/phpize
+ln -s /usr/local/php/bin/php-config /usr/local/bin/php-config
+ln -s /usr/local/php/sbin/php-fpm   /usr/local/sbin/php-fpm
 
-[ -f /usr/local/php/etc/php.ini ]      || cp -f /opt/php-5.4.36/php.ini-production /usr/local/php/etc/php.ini
-[ -f /usr/local/php/etc/php-fpm.conf ] || cp -f /opt/php-5.4.36/sapi/fpm/php-fpm.conf /usr/local/php/etc/php-fpm.conf
-[ -f /usr/etc/init.d/php-fpm ]         || cp -f /opt/php-5.4.36/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+cp -f /opt/php-5.4.36/php.ini-production /usr/local/php/etc/php.ini
+cp -f /opt/php-5.4.36/sapi/fpm/php-fpm.conf /usr/local/php/etc/php-fpm.conf
+cp -f /opt/php-5.4.36/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
 chmod 755  /etc/init.d/php-fpm
+
+
+禁用php中不安全的几个函数 :
+
+disable_functions=exec,shell_exec,system,popen,pclose,passthru,chmod,proc_open,pcntl_exec,chroot,chgrp,putenv,dl,stream_socket_server,chroot,phpinfo
+disable_functions=exec,shell_exec,system,popen,pclose,passthru,chmod,proc_open,pcntl_exec,chroot,chgrp,putenv,dl,stream_socket_server,chroot
 
 chkconfig --add php-fpm
 chkconfig --level 2345 php-fpm on

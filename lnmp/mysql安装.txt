@@ -54,8 +54,8 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
 
 5.复制配置文件【在复制之前先确认一下是不是以及存在这个文件了】
     
-    [ -f  /etc/my.cnf ]        || cp /opt/mysql-5.5.30/support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
-    [ -f  /etc/init.d/mysqld ] || cp /opt/mysql-5.5.30/support-files/mysql.server /etc/init.d/mysqld
+    cp /opt/mysql-5.5.30/support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
+    cp /opt/mysql-5.5.30/support-files/mysql.server /etc/init.d/mysqld
 
     chmod 755 /etc/init.d/mysqld
 
@@ -77,11 +77,11 @@ WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的
     chkconfig --level 2345 mysqld on
 
 9.创建软连接
-    [ -f /usr/local/bin/mysql ]      || ln -s /usr/local/mysql/bin/mysql       /usr/local/bin/mysql
-    [ -f /usr/local/bin/mysqladmin ] || ln -s /usr/local/mysql/bin/mysqladmin  /usr/local/bin/mysqladmin
-    [ -f /usr/local/bin/mysqldump ]  || ln -s /usr/local/mysql/bin/mysqldump   /usr/local/bin/mysqldump
-    [ -f /usr/local/bin/mysqlimport ]|| ln -s /usr/local/mysql/bin/mysqlimport /usr/local/bin/mysqlimport
-    [ -f /usr/local/bin/mysqlshow ]  || ln -s /usr/local/mysql/bin/mysqlshow   /usr/local/bin/mysqlshow
+     ln -s /usr/local/mysql/bin/mysql       /usr/local/bin/mysql
+     ln -s /usr/local/mysql/bin/mysqladmin  /usr/local/bin/mysqladmin
+     ln -s /usr/local/mysql/bin/mysqldump   /usr/local/bin/mysqldump
+     ln -s /usr/local/mysql/bin/mysqlimport /usr/local/bin/mysqlimport
+     ln -s /usr/local/mysql/bin/mysqlshow   /usr/local/bin/mysqlshow
 
 10.初始数据库
     cd /usr/local/mysql/

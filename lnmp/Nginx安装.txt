@@ -32,7 +32,7 @@
   make -j 8 && make install
 
 5. 查看nginx是否在path中。
- [ -f /usr/sbin/nginx ] || ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
+ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
 
 6. 设定启动脚本   写入以下内容
 
