@@ -1,4 +1,4 @@
-﻿日志产生的性能影响 
+日志产生的性能影响 
 日志可带来更多的系统IO，导致系统性能下降
 mysql默认值开启错误日志
 但通常还需要开启binlog
@@ -7,13 +7,13 @@ mysql默认值开启错误日志
 
 
 binlog相关参数及优化策略 
-可通过
+可通过 
+Java代码  
 show variables like '%binlog%'  
 
 来查看binlog配置 
 binlog_cache_size ; 这个参数是给每个客户端使用的， 
 max_binlog_cache_size: 这个参数与binlog_cache_size对应 
-
 上面这两个参数 不大明白什么意思 
 
 max_binlog_size:日志文件大小 一般为512M或1G但不能超过1G 
