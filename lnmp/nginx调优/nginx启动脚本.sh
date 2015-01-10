@@ -1,79 +1,71 @@
-#!/bin/bash
-# nginx Startup script for the Nginx HTTP Server
-# chkconfig: - 85 15
-# processname: nginx
-# pidfile: /usr/local/nginx/logs/nginx.pid
-# config: /usr/local/nginx/conf/nginx.conf
-nginxd=/usr/local/nginx/sbin/nginx
-nginx_config=/usr/local/nginx/conf/nginx.conf
-nginx_pid=/usr/local/nginx/logs/nginx.pid
-RETVAL=0
-prog="nginx"
-# Source function library.
-. /etc/rc.d/init.d/functions
-# Source networking configuration.
-. /etc/sysconfig/network
-# Check that networking is up.
-[ ${NETWORKING} = "no" ] && exit 0
-[ -x $nginxd ] || exit 0
-# Start nginx daemons functions.
-start() {
-if [ -e $nginx_pid ];then
-   echo "nginx already running...."
-   exit 1
-fi
-   echo -n $"Starting $prog: "
-   daemon $nginxd -c ${nginx_config}
-   RETVAL=$?
-   echo
-   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx
-   return $RETVAL
+#! /bin/sh 
+
+### BEGIN INIT INFO 
+# Provides: Nginx-php-fpm(fastcgi) 
+# Required-Start: $php-fpm
+# Required-Stop: $php-fpm
+# Default-Start: 2 3 4 5 
+# Default-Stop: 0 1 6 
+# Short-Description: Start and stop nginx-fcgi in external FASTCGI mode 
+# Description: Start and stop nginx-fcgi in external FASTCGI mode 
+### END INIT INFO 
+
+set -e 
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="nginx daemon"
+NAME=nginx
+DAEMON=/server/nginx/sbin/$NAME
+CONFIGFILE=/server/nginx/conf/nginx.conf
+PIDFILE=/server/nginx/logs/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Gracefully exit if the package has been removed. 
+test -x $DAEMON || exit 0
+
+d_start() {
+        #/usr/local/sbin/php-fpm start # > /dev/null 2>&1 
+        $DAEMON -c $CONFIGFILE || echo -n " already running" 
 }
-# Stop nginx daemons functions.
-stop() {
-        echo -n $"Stopping $prog: "
-        killproc $nginxd
-        RETVAL=$?
-        echo
-        [ $RETVAL = 0 ] && /bin/rm -f /var/lock/subsys/nginx /usr/local/nginx/logs/nginx.pid
+
+d_stop() {
+        #/usr/local/sbin/php-fpm stop # > /dev/null 2>&1 
+        kill -QUIT `cat $PIDFILE` || echo -n " not running" 
 }
-# test nginx daemons functions.
-test() {
-        echo "test $nginx_config configure file "
-        $nginxd -t
+
+d_reload() {
+        #/usr/local/sbin/php-fpm reload # > /dev/null 2>&1 
+        $DAEMON -t && $DAEMON -s reload
+        #kill -HUP `cat $PIDFILE` || echo -n " can't reload" 
 }
-# reload nginx service functions.
-reload() {
-    echo -n $"Reloading $prog: "
-    #kill -HUP `cat ${nginx_pid}`
-    killproc $nginxd -HUP
-    RETVAL=$?
-    echo
-}
-# See how we were called.
+
 case "$1" in
-start)
-        start
+        start)
+            echo -n "Starting $DESC: $NAME" 
+            d_start
+            echo "." 
         ;;
-stop)
-        stop
+        stop)
+            echo -n "Stopping $DESC: $NAME" 
+            d_stop
+            echo "." 
         ;;
-test)
-        test
+        reload)
+            echo -n "Reloading $DESC configuration ..." 
+            d_reload
+            echo "reloaded." 
         ;;
-reload)
-        reload
+        restart)
+            echo -n "Restarting $DESC: $NAME" 
+            d_stop
+            sleep 1
+            d_start
+            echo "." 
         ;;
-restart)
-        stop
-        start
+        *)
+            echo "Usage: $SCRIPTNAME {start|stop|restart|reload}" >&2
+            exit 3
         ;;
-status)
-        status $prog
-        RETVAL=$?
-        ;;
-*)
-        echo $"Usage: $prog {start|stop|test|restart|reload|status|help}"
-        exit 1
 esac
-exit $RETVAL
+
+exit 0
