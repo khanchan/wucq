@@ -1,0 +1,4 @@
+需要设置默认的时区，不然会有很多日志
+
+php.ini
+date.timezone = PRC 或者 其它

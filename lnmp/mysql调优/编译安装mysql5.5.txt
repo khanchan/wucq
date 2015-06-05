@@ -1,0 +1,70 @@
+安装编译工具
+
+yum install gcc gcc-c++
+yum install ncurses-devel
+下载源码
+
+mkdir -p /tmp
+cd /tmp
+wget http://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.15.tar.gz/from/http://mysql.he.net/
+wget http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz
+wget http://ftp.gnu.org/gnu/bison/bison-2.5.tar.gz
+安装cmake和bison
+
+cd /tmp
+tar zxvf cmake-2.8.4.tar.gz
+cd cmake-2.8.4
+./bootstrap
+make
+make install
+cd /tmp
+tar zxvf bison-2.5.tar.gz
+cd bison-2.5
+./configure
+make
+make install
+编译安装MySQL
+##########################################
+
+/usr/sbin/groupadd mysql
+/usr/sbin/useradd -g mysql mysql
+
+tar xvf mysql-5.5.15.tar.gz
+cd mysql-5.5.15/
+
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS=all \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_DATADIR=/var/mysql/data \
+-DMYSQL_USER=mysql
+ 
+make
+make install
+
+##################################################
+
+chmod +w /usr/local/mysql
+chown -R mysql:mysql /usr/local/mysql
+ln -s /usr/local/mysql/lib/libmysqlclient.so.16 /usr/lib/libmysqlclient.so.16
+mkdir -p /var/mysql/
+mkdir -p /var/mysql/data/
+mkdir -p /var/mysql/log/
+chown -R mysql:mysql /var/mysql/
+cd support-files/
+cp my-large.cnf /var/mysql/my.cnf
+cp mysql.server /etc/rc.d/init.d/mysqld
+ 
+/usr/local/mysql/scripts/mysql_install_db \
+--defaults-file=/var/mysql/my.cnf \
+--basedir=/usr/local/mysql \
+--datadir=/var/mysql/data \
+--user=mysql
+ 
+chmod +x /etc/init.d/mysqld

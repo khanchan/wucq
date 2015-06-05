@@ -1,0 +1,28 @@
+
+max_input_time = 180
+memory_limit = 256M
+post_max_size = 8M
+extension_dir = "/server/php5/lib/php/extensions/no-debug-non-zts-20090626/"
+upload_max_filesize = 8M
+
+date.timezone = PRC #### 修改为合适的时区
+
+session.auto_start = 0  ### 改为0 
+
+
+### apc 配置参考 http://www.php.net/manual/zh/apc.configuration.php#ini.apc.num-files-hint
+[apc]
+apc.enabled = 1
+apc.enable_cli = 0
+apc.cache_by_default = on
+apc.shm_segments = 1
+apc.shm_size = 512M    ### 受限于 /proc/sys/kernel/shmmax 通过一段时间的运行后（前后台都操作一遍）得出最佳值
+apc.ttl = 86400  
+apc.user_ttl = 86400 
+apc.gc_ttl = 3600
+apc.num_files_hint = 10000
+apc.user_entries_hint = 10000
+apc.max_file_size = 5M
+apc.stat = 0
+apc.stat_ctime = 0
+apc.include_once_override = on

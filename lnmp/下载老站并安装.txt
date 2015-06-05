@@ -1,0 +1,58 @@
+1.下载解压
+test -d /server/www/weddingdressbee_net || mkdir /server/www/weddingdressbee_net
+cd /server/www/weddingdressbee_net
+wget http://www.uniquemix.com/wedding_dress_bee.tar.gz
+tar xzf wedding_dress_bee.tar.gz 
+mv wedding_dress_bee/* .
+
+2.修改 robots.txt 注释掉全部加入两行
+sed -i -e '2 a Disallow: /' -e '3,$ s/^/#/' robots.txt
+
+3.修改cron文件
+for f in cron.php*;do mv $f $f.bak;done;
+
+4.解压数据库
+unzip wedd_dress_bee0315.sql.zip
+
+5.新建数据库，并导入老站的数据
+mysql -uroot -pmgtgn123 -e 'create database if not exists weddingdressbee_net; use weddingdressbee_net;source /server/weddingdressbee_net/wedd_dress_bee0315.sql;'
+
+6.设定数据库权限
+mysql -uroot -pmgtgn123 -e 'grant all privileges on weddingdressbee_net.* to mgt@"localhost" identified by "mgtgn123" ;flush privileges;'
+
+7.更新站点的域名
+#mysql -uroot -pmgtgn123 -e "use weddingdressbee_net;update core_config_data set value='http://www.weddingdressbee.mobi/' where config_id in(4,5);"
+
+8.修改站点的数据库连接信息
+/server/weddingdressbee_net/app/etc/local.xml
+<host><![CDATA[localhost]]></host>
+<username><![CDATA[mgt]]></username>
+<password><![CDATA[mgtgn123]]></password>
+<dbname><![CDATA[weddingdressbee_net]]></dbname>
+
+9.修该站点样式中的域名  
+cd /server/weddingdressbee_net/app/design/frontend/mercado/default/template/page/html/
+find . -type f -exec sed -i -e's/weddingdressbee\.net/weddingdressbee\.mobi/g' {} \;
+
+10.更改站点目录、文件的属主及其权限
+chown -R www:www /server/www/weddingdressbee_net
+chmod -R 755 /server/www/weddingdressbee_net/var/ /server/weddingdressbee_net/media/
+
+
+###################################################
+###################################################
+###################################################
+###################################################
+以下是一行脚本
+test -d /server/www/weddingdressbee_net || mkdir /server/www/weddingdressbee_net
+cd /server/www/weddingdressbee_net
+wget http://www.uniquemix.com/wedding_dress_bee.tar.gz
+tar xzf wedding_dress_bee.tar.gz 
+mv wedding_dress_bee/* .
+sed -i -e '2 a Disallow: /' -e '3,$ s/^/#/' robots.txt
+for f in cron.php*;do mv $f $f.bak;done;
+unzip wedd_dress_bee0315.sql.zip
+mysql -uroot -pmgtgn123 -e 'create database if not exists weddingdressbee_net; use weddingdressbee_net;source /server/www/weddingdressbee_net/wedd_dress_bee0315.sql;'
+mysql -uroot -pmgtgn123 -e 'grant all privileges on weddingdressbee_net.* to mgt@"localhost" identified by "mgtgn123" ;flush privileges;'
+chown -R www:www /server/www/weddingdressbee_net
+chmod -R 755 /server/www/weddingdressbee_net/var/ /server/www/weddingdressbee_net/media/

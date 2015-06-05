@@ -1,0 +1,68 @@
+影响PHP 5.3运行效率的参数有如下：
+
+pm = dynamic
+
+pm.max_children = 512
+
+pm.start_servers = 128
+
+pm.min_spare_servers = 64
+
+pm.max_spare_servers =256
+
+pm.max_requests = 50000
+
+下面一一介绍他们的作用：
+
+pm = dynamic：表示动态调整
+
+pm.max_children = 512：表示服务器最大允许运行的子进程，这个主要是为了限制PHP运行，防止内存等资源被PHP耗光
+
+pm.start_servers = 128：表示启动PHP的时候生成多少个子进程
+
+pm.min_spare_servers = 64：表示服务器在空闲的时候最小保持的子进程数，注意不是空闲的线程，而是在服务器空闲的时候要保持待命状态的最小子进程数
+
+pm.max_spare_servers =256：表示服务器在空闲的时候最大保持的子进程数，注意不是空闲的线程，而是在服务器空闲的时候要保持待命状态的最大子进程数
+
+pm.max_requests = 50000：表示每个子进程在respawning(重生也就是重启)之前能要处理的最大请求数
+
+
+
+
+对于LNMP架构
+
+有几个参数需要调整，且保持一致
+
+
+
+1，nginx配置文件中：
+
+nginx.conf
+
+worker_connections 65535;
+
+
+
+2，php配置文件中：
+
+php-fpm.conf
+
+rlimit_files = 65535
+
+
+
+3，操作系统中
+
+vi /etc/sysctl.conf
+
+fs.file-max = 65535 
+
+没有这个选项这在最底部添加即可
+
+
+
+4，操作系统设置
+
+ulimit -SHn 65535
+
+echo "ulimit -SHn 65535" /etc/profile

@@ -1,0 +1,139 @@
+﻿
+如果要带上 --with-google_perftools_module  需要先安装gperftools 
+安装方法见 : 《使用gperftools优化Nginx和MySQL内存管理.txt》
+
+1.为nginx建组和用户（nginx以独立的账户和组运行可以方便管理）
+   groupadd www && useradd -M -s /sbin/nologin -g www www
+
+2.获取nginx => http://nginx.org/en/download.html (下载稳定版本1.6.2)
+  cd /opt && wget -c http://nginx.org/download/nginx-1.6.2.tar.gz
+
+3. 解压
+  tar xzf nginx-1.6.2.tar.gz && cd nginx-1.6.2
+
+4. configure
+/opt/nginx-1.6.2/configure \
+--user=www \
+--group=www \
+--http-log-path=/server/logs/nginx_access.log \
+--error-log-path=/server/logs/nginx_error.log \
+--with-http_ssl_module \
+--with-http_flv_module \
+--with-http_sub_module \
+--with-http_stub_status_module \
+--with-http_dav_module \
+--with-http_gzip_static_module \
+--with-http_realip_module \
+--with-file-aio \
+--with-cpu-opt=opteron \
+--with-cc-opt='-O3' \
+--with-google_perftools_module  ####这行可以加入 如果使用google_perftools_module
+
+  make -j 8 && make install
+
+5. 查看nginx是否在path中。
+ln -s /usr/local/nginx/sbin/nginx  /usr/sbin/nginx
+
+6. 设定启动脚本   写入以下内容
+
+cat <<'EOF' > /etc/init.d/nginx
+#!/bin/bash
+### BEGIN INIT INFO 
+# Provides: Nginx-php-fpm(fastcgi) 
+# Required-Start: $php-fpm
+# Required-Stop: $php-fpm
+# Default-Start: 2 3 4 5 
+# Default-Stop: 0 1 6 
+# Short-Description: Start and stop nginx-fcgi in external FASTCGI mode 
+# Description: Start and stop nginx-fcgi in external FASTCGI mode 
+### END INIT INFO 
+
+# nginx Startup script for the Nginx HTTP Server
+# chkconfig: - 85 15
+# processname: nginx
+# pidfile: /usr/local/nginx/logs/nginx.pid
+# config: /usr/local/nginx/conf/nginx.conf
+
+nginxd=/usr/local/nginx/sbin/nginx
+nginx_config=/usr/local/nginx/conf/nginx.conf
+nginx_pid=/usr/local/nginx/logs/nginx.pid
+RETVAL=0
+prog="nginx"
+# Source function library.
+. /etc/rc.d/init.d/functions
+# Source networking configuration.
+. /etc/sysconfig/network
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+[ -x $nginxd ] || exit 0
+# Start nginx daemons functions.
+start() {
+if [ -e $nginx_pid ];then
+   echo "nginx already running...."
+   exit 1
+fi
+   echo -n $"Starting $prog: "
+   daemon $nginxd -c ${nginx_config}
+   RETVAL=$?
+   echo
+   [ $RETVAL = 0 ] && touch /var/lock/subsys/nginx
+   return $RETVAL
+}
+# Stop nginx daemons functions.
+stop() {
+        echo -n $"Stopping $prog: "
+        killproc $nginxd
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && /bin/rm -f /var/lock/subsys/nginx /usr/local/nginx/logs/nginx.pid
+}
+# test nginx daemons functions.
+test() {
+        echo "test $nginx_config configure file "
+        $nginxd -t
+}
+# reload nginx service functions.
+reload() {
+    echo -n $"Reloading $prog: "
+    #kill -HUP `cat ${nginx_pid}`
+    killproc $nginxd -HUP
+    RETVAL=$?
+    echo
+}
+# See how we were called.
+case "$1" in
+start)
+        start
+        ;;
+stop)
+        stop
+        ;;
+test)
+        test
+        ;;
+reload)
+        reload
+        ;;
+restart)
+        stop
+        start
+        ;;
+status)
+        status $prog
+        RETVAL=$?
+        ;;
+*)
+        echo $"Usage: $prog {start|stop|test|restart|reload|status|help}"
+        exit 1
+esac
+exit $RETVAL
+
+######### 结束 /etc/init.d/nginx
+
+EOF
+
+chmod +x /etc/init.d/nginx
+chkconfig --add nginx && chkconfig nginx on
+
+which nginx && nginx -t && service nginx restart && service nginx stop && service nginx start && service nginx reload
+  

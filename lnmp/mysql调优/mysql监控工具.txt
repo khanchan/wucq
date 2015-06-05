@@ -1,0 +1,9 @@
+http://jeremy.zawodny.com/mysql/mytop/  告诉您目前 MySQL 服务器上都在进行什么操作，并提供一些关键的统计信息。在发现数据库有问题时，应该首先求助于这个程序。
+
+
+http://gert.sos.be/en/
+ 会给出 MySQL 服务器一个关键性能指示器的图形表示，并给出一些调优建议。
+
+
+
+http://hackmysql.com/mysqlreport  是一个必须的工具。它为您分析 SHOW STATUS 变量。

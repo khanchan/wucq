@@ -1,0 +1,192 @@
+﻿
+安装libiconv
+
+cd /opt
+wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+tar zxvf libiconv-1.14.tar.gz 
+cd libiconv-1.14/
+./configure 
+make -j 16 && make install
+ln -s /usr/local/lib/libiconv.so.2 /usr/lib64/libiconv.so.2
+
+##############################################################################
+
+安装mhash 
+
+cd /opt
+wget -c http://nchc.dl.sourceforge.net/project/mhash/mhash/0.9.9.9/mhash-0.9.9.9.tar.gz
+tar zxvf mhash-0.9.9.9.tar.gz
+cd mhash-0.9.9.9
+./configure
+make -j 16 && make install
+
+ln -sf /usr/local/lib/libmhash.a /usr/lib64/libmhash.a
+ln -sf /usr/local/lib/libmhash.la /usr/lib64/libmhash.la
+ln -sf /usr/local/lib/libmhash.so /usr/lib64/libmhash.so
+ln -sf /usr/local/lib/libmhash.so.2 /usr/lib64/libmhash.so.2
+ln -sf /usr/local/lib/libmhash.so.2.0.1 /usr/lib64/libmhash.so.2.0.1
+
+ldconfig
+##############################################################################
+
+安装mcrypt 
+
+cd /opt
+wget -c http://nchc.dl.sourceforge.net/project/mcrypt/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz
+tar xzf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8
+./configure
+make -j 16 && make install
+
+##############################################################################
+# 如果with-imap 则执行以下两行
+
+yum -y install libc-client-devel.x86_64
+ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.so
+##############################################################################
+
+### 在安装nginx的时候已经添加了该用户组和用户
+#groupadd www
+#useradd www -M -s /sbin/nologin -g www
+
+cd /opt
+wget -c http://cn2.php.net/get/php-5.4.36.tar.gz/from/am1.php.net/mirror
+tar xzf php-5.4.36.tar.gz
+cd php-5.4.36
+ 
+## 在configure之前清空一下。
+/opt/php-5.4.36/buildconf --force && /opt/php-5.4.36/configure \
+--prefix=/usr/local/php \
+--with-config-file-path=/usr/local/php/etc \
+--disable-ipv6 \
+--disable-debug \
+--enable-fpm \
+--enable-soap \
+--enable-sockets \
+--enable-gd-native-ttf \
+--enable-ftp \
+--enable-mbstring \
+--enable-exif \
+--enable-dom \
+--with-fpm-user=www \
+--with-fpm-group=www \
+--with-openssl \
+--with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
+--with-mysql-sock=/tmp \
+--with-gd \
+--with-jpeg-dir \
+--with-png-dir \
+--with-freetype-dir \
+--with-iconv-dir \
+--with-zlib-dir \
+--with-mcrypt \
+--with-pear \
+--with-curl \
+--with-libxml-dir \
+--with-imap \
+--with-imap-ssl \
+--with-kerberos \
+--with-mhash \
+--enable-cli \
+
+php-5.3之后可使用zend引擎自带【无须安装】的mysql驱动比较高效。
+最关键的是如果用老的libmysql的方式一定要求安装mysql-lib。
+--with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
+这三行转为 :
+--with-mysql=mysqlnd \
+--with-mysqli=mysqlnd \
+--with-pdo-mysql=mysqlnd \
+
+make -j 4 ZEND_EXTRA_LIBS='-liconv'
+
+### 加入链接库
+修改 Makefile 
+大约99 行左右的地方: EXTRA_LIBS = ..... -lcrypt 在最后加上 -liconv
+例如: EXTRA_LIBS = ..... -lcrypt 后面加上 -liconv
+然后重新再次 make 即可。
+
+### 如果前面没有加 -liconv 这里必须加 make 参数 make -j 4 ZEND_EXTRA_LIBS='-liconv'
+make -j 16  && make install   
+
+ln -s /usr/local/php/bin/pear       /usr/local/bin/pear
+ln -s /usr/local/php/bin/peardev    /usr/local/bin/peardev
+ln -s /usr/local/php/bin/pecl       /usr/local/bin/pecl
+ln -s /usr/local/php/bin/phar.phar  /usr/local/bin/phar
+ln -s /usr/local/php/bin/php        /usr/local/bin/php
+ln -s /usr/local/php/bin/phpize     /usr/local/bin/phpize
+ln -s /usr/local/php/bin/php-config /usr/local/bin/php-config
+ln -s /usr/local/php/sbin/php-fpm   /usr/local/sbin/php-fpm
+
+cp -f /opt/php-5.4.36/php.ini-production /usr/local/php/etc/php.ini
+cp -f /opt/php-5.4.36/sapi/fpm/php-fpm.conf /usr/local/php/etc/php-fpm.conf
+cp -f /opt/php-5.4.36/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+chmod 755  /etc/init.d/php-fpm
+
+
+禁用php中不安全的几个函数 :
+
+disable_functions=exec,shell_exec,system,popen,pclose,passthru,chmod,proc_open,pcntl_exec,chroot,chgrp,putenv,dl,stream_socket_server,chroot,phpinfo
+disable_functions=exec,shell_exec,system,popen,pclose,passthru,chmod,proc_open,pcntl_exec,chroot,chgrp,putenv,dl,stream_socket_server,chroot
+
+chkconfig --add php-fpm
+chkconfig --level 2345 php-fpm on
+
+service php-fpm  start 
+service php-fpm  stop 
+service php-fpm  start 
+service php-fpm  restart
+service php-fpm  reload
+==========================================================================
+安装 APC
+
+cd /opt
+wget -c http://pecl.php.net/get/APC-3.1.13.tgz
+tar xzf APC-3.1.13.tgz
+cd APC-3.1.13
+/usr/local/php/bin/phpize
+./configure --enable-apc --enable-apc-mmap --with-php-config=/usr/local/php/bin/php-config
+make -j 8 && make install
+
+vim /usr/local/php/etc/php.ini
+查找   extension_dir = "./"
+替换为 extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/"
+
+并且在extension=***区块的 （大概960行）下面添加 extension = apc.so
+
+配置php.ini 末尾加入
+
+[apc]
+apc.enabled = 1
+apc.shm_size = 512M
+apc.ttl = 86400
+apc.user_ttl = 86400
+apc.num_files_hint = 10000
+apc.user_entries_hint = 10000
+apc.max_file_size = 5M
+apc.stat = 0  
+
+#(0是不更新PHP文件）
+
+以下代码用来替换 /usr/local/php/etc/php.ini 中的 ;extension_dir = "./" 为 extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/"
+并且在extension=***区块的 （大概960行）下面添加 extension = apc.so
+并且在末尾加入APC的配置信息
+##############################
+##############################
+##############################
+sed -i \
+-e 's/;\ extension_dir\ =\ "\.\/"/extension_dir\ =\ "\/usr\/local\/php\/lib\/php\/extensions\/no-debug-non-zts-20100525\/"/' \
+-e 's/;extension=php_bz2\.dll/extension=apc.so/' \
+-e '$ a [apc] \
+apc.enabled = 1 \
+apc.shm_size = 512M \
+apc.ttl = 86400 \
+apc.user_ttl = 86400 \
+apc.num_files_hint = 10000 \
+apc.user_entries_hint = 10000 \
+apc.max_file_size = 5M \
+apc.stat = 0' \
+/usr/local/php/etc/php.ini

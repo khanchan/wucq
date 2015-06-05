@@ -1,0 +1,124 @@
+﻿
+
+准备：
+ yum -y install cmake 
+
+1.安装前首先创建mysql用户
+  groupadd mysql
+  useradd -M -d /var/lib/mysql -s /sbin/nologin -g mysql mysql
+  ### -d 指定shell（该shell不可交互） 
+  ### -s 指定为mysql的home目录 /var/lib/mysql
+
+2.获取mysql
+  cd /opt
+  wget -c http://downloads.mysql.com/archives/mysql-5.5/mysql-5.5.30.tar.gz
+  tar zxvf mysql-5.5.30.tar.gz
+  
+  2.1 添加sphinx插件
+    cd /opt
+    wget -c http://sphinxsearch.com/files/sphinx-2.0.8-release.tar.gz
+    tar xzf sphinx-2.0.8-release.tar.gz 
+    cd /opt/sphinx-2.0.8-release
+    mkdir -p /opt/mysql-5.5.30/storage/sphinx && cp -R /opt/sphinx-2.0.8-release/mysqlse/*  /opt/mysql-5.5.30/storage/sphinx
+
+3.配置编译选项 [ccmake . 命令可以查看所有有选项 h 键可以打开帮助]
+
+cd /opt/mysql-5.5.30 
+
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/tmp/mysqld.sock \
+-DMYSQL_DATADIR=/usr/local/mysql/data \
+-DWITH_EXTRA_CHARSETS=all \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DWITH_SSL=system \
+-DWITH_EMBEDDED_SERVER=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DWITH_SSL=yes \
+-DWITH_DEBUG=0 \
+-DWITH_SPHINX_STORAGE_ENGINE=1
+
+说明：
+MYSQL_UNIX_ADDR                 socket文件的路径
+MYSQL_DATADIR                   数据文件存放路径
+WITH_EXTRA_CHARSETS             对多字符集的支持
+DEFAULT_CHARSET                 默认字符集的编码
+DEFAULT_COLLATION               默认的基于字符的比对校验
+WITH_MYISAM_STORAGE_ENGINE      开启MYISAM引擎
+WITH_INNOBASE_STORAGE_ENGINE    开启INNOBASE引擎
+WITH_READLINE                   使用READLINE库（注-1）
+WITH_SSL=bundled/system         开启SSL两个值bundled是指用mysql自带的代码 , system是使用系统中已安装的版本
+WITH_SPHINX_STORAGE_ENGINE=1    开启sphinx引擎
+
+-DWITHOUT_PARTITION_STORAGE_ENGINE=1 \  ### 效果不明
+
+注-1 ： readline是*nix下强大的命令行接口库（Command Line Interface），举个形象点的例子：shell(如bash)命令行巧命令时自动补全、快捷键、命令历史记录等功能就是基于GNU ReadLine完成的。
+
+
+4.编译和安装
+
+   make -j 16 && make install
+
+5.复制配置文件
+    
+    rm -f /etc/my.cnf
+    rm -f /etc/init.d/mysqld
+    cp /opt/mysql-5.5.30/support-files/my-innodb-heavy-4G.cnf /etc/my.cnf
+    cp /opt/mysql-5.5.30/support-files/mysql.server /etc/init.d/mysqld
+    chmod 755 /etc/init.d/mysqld
+
+6. 改变权限和初始化mysql 服务器的系统表,
+    cd /usr/local/mysql
+    chgrp -R mysql .
+    chown -R root .
+    chown -R mysql data
+
+7. 修改/etc/my.cnf
+    basedir   = /usr/local/mysql
+    datadir   = /usr/local/mysql/data
+    log-error = /server/logs/mysql-error.log 
+
+    修改  innodb_data_file_path = ibdata1:10M:autoextend  改为  innodb_data_file_path = ibdata1:1G:autoextend
+
+8.开启2345运行级别的自启动（开机自启动）
+    chkconfig --add mysqld
+    chkconfig --level 2345 mysqld on
+
+9.创建软连接
+    ln -s /usr/local/mysql/bin/mysql /usr/bin/mysql
+    ln -s /usr/local/mysql/bin/mysqladmin /usr/bin/mysqladmin
+    ln -s /usr/local/mysql/bin/mysqldump /usr/bin/mysqldump
+    ln -s /usr/local/mysql/bin/mysqlimport /usr/bin/mysqlimport
+    ln -s /usr/local/mysql/bin/mysqlshow /usr/bin/mysqlshow
+
+10.初始数据库
+    cd /usr/local/mysql/
+    scripts/mysql_install_db --user=mysql
+       #### bin/mysqld_safe --user=mysql & ######可用service 直接启动 如果要添加tcmalloc支持 转到12步
+    service mysqld start
+    service mysqld stop 
+    service mysqld start
+    service mysqld restart
+
+10.设置root 密码
+    mysqladmin -uroot -p password "mgtgn123"
+
+11.检查安装模块
+    mysql -u root -pmgtgn123 -e 'SHOW variables like "have_%";'
+
+    mysql -u root -pmgtgn123 -e 'install plugin sphinx soname "ha_sphinx.so";'
+    mysql -u root -pmgtgn123 -e 'show engines;'
+
+12.添加tcmalloc支持
+  查找文件 /usr/local/mysql/bin/mysqld_safe
+  在# executing mysqld_safe 这行下面加上
+  export LD_PRELOAD=/usr/local/lib/libtcmalloc.so
+
+13.验证 tcmalloc 是否运行
+  重新启动MYSQL
+  验证 tcmalloc 是否运行：
+  lsof -n | grep tcmalloc
+

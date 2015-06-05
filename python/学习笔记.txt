@@ -1,0 +1,80 @@
+
+需要掌握的python常见模块 
+re
+os
+io
+sys
+sys.path
+math
+glob
+pickle (cPickle比较快）
+random
+urllib
+hashlib
+html
+    html.entities
+    html.parser
+http
+    http.client
+    http.cookiejar
+    http.cookies
+    http.server
+xml : Package containing XML processing modules 
+     xml.dom : Document Object Model API for Python. 
+     xml.dom.minidom : Minimal Document Object Model (DOM) implementation. 
+     xml.dom.pulldom : Support for building partial DOM trees from SAX events. 
+     xml.etree.ElementTree : Implementation of the ElementTree API. 
+     xml.parsers.expat : An interface to the Expat non-validating XML parser. 
+     xml.parsers.expat.errors  
+     xml.parsers.expat.model  
+     xml.sax : Package containing SAX2 base classes and convenience functions. 
+     xml.sax.handler : Base classes for SAX event handlers. 
+     xml.sax.saxutils : Convenience functions and classes for use with SAX. 
+     xml.sax.xmlreader : Interface  
+
+
+有几个函数比较有用
+id()
+help()
+dir()
+repr() 用print()或者格式化%s输出时用来表示的字符串
+map(func   , *iterables)
+map(lambda , *iterables)
+reduce(func, [1, 2, 3, 4, 5])
+reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
+内置函数列表如下
+abs().........dict()........help()........min().........
+setattr().....all().........dir().........hex().........
+next()........slice().......any().........divmod()......
+id()..........object()......sorted()......ascii().......
+enumerate()...input().......oct().........staticmethod()
+bin().........eval()........int().........open()........
+str().........bool()........exec()........isinstance()..
+ord().........sum().........bytearray()...filter()......
+issubclass()..pow().........super().......bytes().......
+float().......iter()........print().......tuple().......
+callable()....format()......len().........property()....
+type()........chr().........frozenset()...list()........
+range().......vars()........classmethod().getattr().....
+locals()......repr()........zip().........compile().....
+globals().....map().........reversed()....__import__()..
+complex().....hasattr().....max().........round().......
+delattr().....hash()........memoryview()..set().........
+
+1. python的list初始化可以用循环：
+list = [ x*2 for x in range(10) if x%2 ]
+list = [(x,y,z) for x in range(10) for y in range(10,20) for z in range(20,30)]
+
+2. 复制一个list
+list_new = list_old[:]
+
+3. 随机数
+
+ary = ["a" , "b" , "c" , "d" , "e" ,"f"] 
+ary = ("a" , "b" , "c" , "d" , "e" , "f")
+
+print(random.choice(ary)) # 在区间中随机选取一个
+print(random.choice(range(100))) # 在区间中随机选取一个
+print(random.uniform(1,4)) # 1-4之间的浮点数
+
+4. 用global获取全局的变量（在函数中）

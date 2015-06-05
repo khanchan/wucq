@@ -1,0 +1,126 @@
+﻿
+mv /etc/modprobe.conf /etc/modprobe.d
+
+1, 启动 iptables  写入基本的防火墙规则 确保生效   
+
+   随便写入一个iptables规则     iptables -A INPUT -p TCP --dport  22  -j ACCEPT
+
+   保存文件  service iptables save
+
+   vi /etc/sysconfig/iptables
+
+# Firewall configuration written by system-config-firewall
+# Manual customization of this file is not recommended.
+
+*filter
+:INPUT ACCEPT [0:0]
+
+:FORWARD ACCEPT [0:0]
+
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 12222 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+
+COMMIT前不能有空行
+   service iptables restart
+
+2，修改SSH端口
+    vi /etc/ssh/sshd_config  
+
+    Port 12222
+    service sshd restart
+
+要拿掉22端口的访问权限
+
+3，安装APF 防火墙  并安装BFD防破解
+ cd /opt
+ wget http://www.rfxn.com/downloads/apf-current.tar.gz
+ tar zxvf apf-current.tar.gz
+ cd apf-9.7-2
+ ./install.sh
+ vim /etc/apf/conf.apf
+
+ DEVEL_MODE="1"   关闭调试
+ 更改网卡 IFACE_IN 和 IFACE_OUT ，多网卡虚拟就填Master的虚拟网卡名。  为： bond1  
+ 打开RAB
+ 修改允许通过端口： IG_TCP_CPORTS
+    说明： http://www.securecentos.com/install-apf-firewall-on-your-centos-linux-server/
+    APF自9.6 (rev:2)版本之后增加了RAB模块.该模块取代了旧版本的antidos模块.
+
+cd /opt
+wget http://www.rfxn.com/downloads/bfd-current.tar.gz
+tar zxvf bfd-current.tar.gz
+cd bfd-1.5   
+./install.sh
+打开邮件报警功能
+
+vim  /usr/local/bfd/conf.bfd
+
+EMAIL_ALERTS="1"
+EMAIL_ADDRESS="guoping@hz-gn.com"
+EMAIL_SUBJECT="gongji!!!----------------> $HOSTNAME"
+
+
+  重启APF：     apf -r  
+
+!!!!!!  APF 和 BFD 必须装在一起 ，不然没有起到防火墙作用 !!!!!!
+
+4, 更新所有能更新的软件
+
+   yum --exclude=httpd* --exclude=php* update
+
+5，安装必要的库  
+
+   yum -y install cmake  
+   yum -y install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel gd-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
+   yum -y install ntp libc-client-devel vim-enhanced curl  gettext-devel apr-devel apr-util-devel  gmp-devel pspell-devel  pam-devel libtiff-devel  libjpeg-devel  libmcrypt-devel freetype libevent* libtool
+   yum -y install perl-Net-SSLeay perl-Crypt-SSLeay perl-DBI perl-DBD-MySQL
+   yum -y install apr*  curl-devel  openssl openssl-devel pcre-devel gd kernel keyutils perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-libs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel libXpm*  libjpeg* libpng* php-common php-gd ncurses* libtool* libxml2  patch
+
+最小化安装时     安装最基本的开发工具   yum groupinstall "Development Tools" "Legacy Software Development"
+    yum remove httpd php
+    rm -f  /etc/php.ini
+6,关闭selinux   整个安装完后再打开调试一下
+
+   /usr/sbin/setenforce 0   或者 vi /etc/sysconfig/selinux 
+
+7. 更改bash的 ps1 和 设置vim环境
+
+cat <<EOF>>/etc/bashrc
+c1="\[\e[0m\]"
+c0="\[\e[30m\]"
+c1="\[\e[31m\]"
+c2="\[\e[32m\]"
+c3="\[\e[33m\]"
+c4="\[\e[34m\]"
+c5="\[\e[35m\]"
+c6="\[\e[36m\]"
+c7="\[\e[37m\]"
+PS1='$c1\u$c2@\h$c3[\t]$c4[no:\!]$c5$c6[pwd:\w]$c7$c1\n$c2>';
+export PAGER=less
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+EOF
+
+vim /etc/vimrc
+
+set nu
+set ts=4
+set sw=4
+
+8. 新建需要用到的目录
+ 
+ mkdir -p /server/{www,logs}
+ chmod -R 755 /server/logs

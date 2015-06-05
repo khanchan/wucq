@@ -1,0 +1,62 @@
+/etc/security/limits.conf
+
+1、 limits.conf 描述
+limits.conf文件实际是Linux PAM（插入式认证模块，Pluggable Authentication Modules）中 pam_limits.so 的配置文件，突破系统的默认限制，对系统访问资源有一定保护作用。 limits.conf 和sysctl.conf区别在于limits.conf是针对用户，而sysctl.conf是针对整个系统参数配置。
+
+2、limits.conf工作原理
+limits.conf是 pam_limits.so的 配置文件，然后/etc/pam.d/下的应用程序调用pam_***.so模块。譬如说，当用户 访问服务器，服务程序将请求发送到PAM模块，PAM模块根据服务名称在/etc/pam.d目 录下选择一个对应的服务文件，然后根据服务文件的内容选择具体的PAM模块进行处理
+
+例如：限制admin用户登录到sshd的服务不能超 过2个
+在/etc/pam.d/sshd中添加：session required pam_limits.so 
+在/etc/security/limits.conf中添加：admin - maxlogins 2 
+注意：查看应用程序能否被PAM支持，用ldd 
+
+同理limits.conf要使用就必须保证/etc/pam.d/login 中有下面：
+
+session    required   pam_limits.so
+
+3、limits.conf文件格式：username|@groupname   type  resource  limit
+
+1）username|@groupname
+设置需要被限制的用户名，组名前面加@和用户名区别。也可用通配符*来做所有用户的限制
+
+2）type
+类型有soft，hard 和 -，其中soft 指的是当前系统生效的设置值。hard 表明系统中所能设定的最大值。soft 的限制不能比hard 限制高。用 - 就表明同时设置了soft 和hard的值
+
+3）resource： 表示要限制的资源
+
+（1）core - 限制内核文件的大小
+何谓core文件,当一个程序崩溃时，在进程当前工作目录的core文件中复制了该进程的存储图像。core文件仅仅是一个内存映象（同时加上调试信息），主要是用来调试的。core文件是个二进制文件，需要用相应的工具来分析程序崩溃时的内存映像，系统默认core文件的大小为0，所以没有被创建。可以用ulimit命令查看和修改core文件的大小，例如：
+#ulimit –c
+0
+#ulimit -c 1000
+-c 指定修改core文件的大小，1000指定了core文件大小。也可以对core文件的大小不做限制，如： ulimit -c unlimited
+注意：如果想让修改永久生效，则需要修改配置文件，如 .bash_profile、/etc/profile或/etc/security/limits.conf
+
+（2）date - 最大数据大小
+
+（3）fsize - 最大文件大小
+
+（4）memlock - 最大锁定内存地址空间
+
+（5）nofile - 打开文件的最大数目
+
+对于需要做许多套接字连接并使它们处于打开状态的应用程序而言，最好通过使用ulimit -n，或者通过设置nofile参数，为用户把文件描述符的数量设置得比默认值高一些
+
+（6）rss - 最大持久设置大小
+
+（7）stack - 最大栈大小
+
+（8）cpu - 以分钟为单位的最多 CPU 时间
+
+（9）noproc - 进程的最大数目
+
+（10）as - 地址空间限制
+
+（11）maxlogins - 此用户允许登录的最大数目
+
+注意：要使 limits.conf 文件配置生效，必须要确保 pam_limits.so 文件被加入到启动文件中。查看 /etc/pam.d/login 文件中有：session required /lib/security/pam_limits.so
+
+4、limits.conf设置
+1）暂时生效，适用于通过 ulimit 命令登录 shell 会话期间
+2）永久生效，通过将一个相应的 ulimit 语句添加到由登录 shell 读取的文件之一（例如 ~/.profile），即特定于 shell 的用户资源文件；或者通过编辑 /etc/security/limits.conf 

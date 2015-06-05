@@ -1,0 +1,24 @@
+﻿
+fastcgi_cache_path /server/nginx/fastcgi_cache levels=1:2keys_zone=TEST:10minactive=5m; 这个指令为FastCGI 缓存指定一个路径，目录结构等级，关键字区域存储时间和非活动删除时间。 
+fastcgi_connect_timeout 300; 指定连接到后端FastCGI 的超时时间。 
+fastcgi_send_timeout 300; 向FastCGI 传送请求的超时时间，这个值是指已经完成两次握手后向FastCGI 传送请求的超时时间。 
+fastcgi_read_timeout 300; 接收FastCGI 应答的超时时间，这个值是指已经完成两次握手后接收FastCGI 应答的超时时间。 
+fastcgi_buffer_size 128k; 指定读取FastCGI应答第一部分需要用多大的缓冲区，一般第一部分应答不会超过1k，由于页面大小为4k，所以这里设置为4k。 
+fastcgi_buffers 4 128k; 指定本地需要用多少和多大的缓冲区来缓冲FastCGI 的应答。 
+fastcgi_busy_buffers_size 8k; 这个指令我也不知道是做什么用，只知道默认值是fastcgi_buffers 的两倍。 
+fastcgi_temp_file_write_size 8k; 在写入fastcgi_temp_path 时将用多大的数据块，默认值是fastcgi_buffers 的两倍。 
+fastcgi_cache TEST 开启FastCGI 缓存并且为其制定一个名称。个人感觉开启缓存非常有用，可以有效降低CPU 负载，并且防止502 错误。 
+fastcgi_cache_valid 200 302 1h; fastcgi_cache_valid 301 1d; fastcgi_cache_valid any 1m; 为指定的应答代码指定缓存时间，如上例中将200，302 应答缓存一小时，301 应答缓存1 天，其他为1 分钟。 
+fastcgi_cache_min_uses 1; 缓存在fastcgi_cache_path 指令inactive 参数值时间内的最少使用次数，如上例，如果在5 分钟内某文件1次也没有被使用，那么这个文件将被移除。 
+fastcgi_cache_use_stale error timeout invalid_headerhttp_500; 不知道这个参数的作用，猜想应该是让nginx 知道哪些类型的缓存是没用的。以上为nginx 中FastCGI相关参数，另外，FastCGI 自身也有一些配置需要进行优化，
+
+如果你使用php-fpm来管理FastCGI，可以修改配置文件中的以下值： 
+
+max_children 60
+同时处理的并发请求数，即它将开启最多60 个子线程来处理并发连接。 
+
+rlimit_files 102400
+最多打开文件数
+
+max_requests 204800
+每个进程在重置之前能够执行的最多请求数。

@@ -1,0 +1,4 @@
+
+找到这行："long|!" => \$config{long_nums},
+
+修改为："long|long_nums|l!" => \$config{long_nums},

@@ -1,0 +1,35 @@
+[global]
+error_log = /server/logs/php-fpm.log
+
+log_level = error
+
+events.mechanism = epoll
+[www]
+listen = 127.0.0.1:9000
+listen.allowed_clients = 127.0.0.1
+
+user = www
+group = www
+
+pm = dynamic
+pm.max_children = 500
+pm.start_servers = 50
+pm.min_spare_servers = 50
+pm.max_spare_servers = 80
+pm.process_idle_timeout = 100s
+pm.max_requests = 5000
+
+request_terminate_timeout = 900
+
+
+#### 这两项务必和nginx中的配置相同
+pm.status_path = /status
+ping.path = /ping
+ping.response = pong
+
+slowlog = /server/logs/php-fpm-slow.log
+request_slowlog_timeout = 800s
+
+## 选择性开启 ，开发的时候务必开启
+php_flag[display_errors] = on
+

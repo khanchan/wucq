@@ -1,0 +1,175 @@
+﻿1.安装所需软件
+yum install gcc gcc-c++ ncurses ncurses-devel openssl openssl-devel bison
+
+2.下载安装cmake（MySQL5.5.x版本改为跨平台的cmake编译）
+get http://www.cmake.org/files/v2.8/cmake-2.8.5.tar.gz
+ 
+tar zxvf cmake-2.8.5.tar.gz
+cd cmake-2.8.5
+./bootstrap
+make
+make install
+
+3.下载安装MySQL5.5.14
+
+1）安装前首先创建mysql用户
+groupadd mysql
+useradd -r -g mysql mysql
+
+2）编译安装
+192.168.1.127 下载的是5.5.20
+### chinaunix.net 下载
+http://down1.chinaunix.net/distfiles/mysql-5.5.20.tar.gz
+#wget http://mysql.he.net/Downloads/MySQL-5.5/mysql-5.5.14.tar.gz
+#tar zxvf mysql-5.5.14.tar.gz
+#cd mysql-5.5.14
+ 
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_DATADIR=/usr/local/mysql/data \
+-DEXTRA_CHARSETS=all \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_READLINE=1 \
+-DWITH_SSL=bundled \
+-DWITH_EMBEDDED_SERVER=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITHOUT_PARTITION_STORAGE_ENGINE=1 \
+-DWITH_DEBUG=0
+ 
+make && make install
+
+备注：如果更改编译配置
+make clean
+rm -f CMakeCache.txt
+3）权限设置及初始表安装
+
+#### 当编译，安装完成后。
+#### 去安装目录，初始化mysql 服务器的系统表
+cd /usr/local/mysql
+chown -R mysql:mysql .
+scripts/mysql_install_db --user=mysql
+chown -R root .
+chown -R mysql data
+
+4）配置文件
+cd 到源代码目录
+cp support-files/my-medium.cnf /etc/my.cnf
+
+备注：如果在编译的时候没有加入初始数据库默认字符集参数（-DDEFAULT_CHARSET=utf8 ，-DDEFAULT_COLLATION=utf8_general_ci ），那么在安装完成后就需要编辑my.ini，在[client]和[mysqld]更改MySQL默认编码，保存并关闭。如下：
+[client]
+default-character-set = utf8
+ 
+[mysqld]
+character-set-server = utf8
+
+5）后台启动MySQL
+
+bin/mysqld_safe --user=mysql &
+
+6）配置MySQL服务自启动
+cp support-files/mysql.server /etc/init.d/mysqld
+chmod +x /etc/init.d/mysqld
+chkconfig --add mysqld
+chkconfig mysqld on
+
+ln -s /usr/local/mysql/bin/mysqladmin /usr/local/bin/mysqladmin
+ln -s /usr/local/mysql/bin/mysql /usr/local/bin/mysql
+ln -s /usr/local/mysql/bin/mysqldump /usr/local/bin/mysqldump
+
+grant all privileges on *.* to wcq@'127.0.0.1' identified by 'wcqgn123';
+grant all privileges on *.* to wcq@'localhost' identified by 'wcqgn123';
+flush privileges;
+
+6）MySQL测试测试命令
+
+/usr/local/mysql/bin/mysqladmin version
+/usr/local/mysql/bin/mysqladmin variables
+附录：
+
+1）查看MySQL字符集
+mysql> show variables like 'character%';
++--------------------------+----------------------------------+
+| Variable_name            | Value                            |
++--------------------------+----------------------------------+
+| character_set_client     | utf8                             |
+| character_set_connection | utf8                             |
+| character_set_database   | latin1                           |
+| character_set_filesystem | binary                           |
+| character_set_results    | utf8                             |
+| character_set_server     | latin1                           |
+| character_set_system     | utf8                             |
+| character_sets_dir       | /usr/local/mysql/share/charsets/ |
++--------------------------+----------------------------------+
+8 rows in set (0.01 sec)
+ 
+mysql> show variables like 'collation%';
++----------------------+-------------------+
+| Variable_name        | Value             |
++----------------------+-------------------+
+| collation_connection | utf8_general_ci   |
+| collation_database   | latin1_swedish_ci |
+| collation_server     | latin1_swedish_ci |
++----------------------+-------------------+
+3 rows in set (0.00 sec)
+ 
+mysql> show character set;
++----------+-----------------------------+---------------------+--------+
+| Charset  | Description                 | Default collation   | Maxlen |
++----------+-----------------------------+---------------------+--------+
+| big5     | Big5 Traditional Chinese    | big5_chinese_ci     |      2 |
+| dec8     | DEC West European           | dec8_swedish_ci     |      1 |
+| cp850    | DOS West European           | cp850_general_ci    |      1 |
+| hp8      | HP West European            | hp8_english_ci      |      1 |
+| koi8r    | KOI8-R Relcom Russian       | koi8r_general_ci    |      1 |
+| latin1   | cp1252 West European        | latin1_swedish_ci   |      1 |
+| latin2   | ISO 8859-2 Central European | latin2_general_ci   |      1 |
+| swe7     | 7bit Swedish                | swe7_swedish_ci     |      1 |
+| ascii    | US ASCII                    | ascii_general_ci    |      1 |
+| ujis     | EUC-JP Japanese             | ujis_japanese_ci    |      3 |
+| sjis     | Shift-JIS Japanese          | sjis_japanese_ci    |      2 |
+| hebrew   | ISO 8859-8 Hebrew           | hebrew_general_ci   |      1 |
+| tis620   | TIS620 Thai                 | tis620_thai_ci      |      1 |
+| euckr    | EUC-KR Korean               | euckr_korean_ci     |      2 |
+| koi8u    | KOI8-U Ukrainian            | koi8u_general_ci    |      1 |
+| gb2312   | GB2312 Simplified Chinese   | gb2312_chinese_ci   |      2 |
+| greek    | ISO 8859-7 Greek            | greek_general_ci    |      1 |
+| cp1250   | Windows Central European    | cp1250_general_ci   |      1 |
+| gbk      | GBK Simplified Chinese      | gbk_chinese_ci      |      2 |
+| latin5   | ISO 8859-9 Turkish          | latin5_turkish_ci   |      1 |
+| armscii8 | ARMSCII-8 Armenian          | armscii8_general_ci |      1 |
+| utf8     | UTF-8 Unicode               | utf8_general_ci     |      3 |
+| ucs2     | UCS-2 Unicode               | ucs2_general_ci     |      2 |
+| cp866    | DOS Russian                 | cp866_general_ci    |      1 |
+| keybcs2  | DOS Kamenicky Czech-Slovak  | keybcs2_general_ci  |      1 |
+| macce    | Mac Central European        | macce_general_ci    |      1 |
+| macroman | Mac West European           | macroman_general_ci |      1 |
+| cp852    | DOS Central European        | cp852_general_ci    |      1 |
+| latin7   | ISO 8859-13 Baltic          | latin7_general_ci   |      1 |
+| utf8mb4  | UTF-8 Unicode               | utf8mb4_general_ci  |      4 |
+| cp1251   | Windows Cyrillic            | cp1251_general_ci   |      1 |
+| utf16    | UTF-16 Unicode              | utf16_general_ci    |      4 |
+| cp1256   | Windows Arabic              | cp1256_general_ci   |      1 |
+| cp1257   | Windows Baltic              | cp1257_general_ci   |      1 |
+| utf32    | UTF-32 Unicode              | utf32_general_ci    |      4 |
+| binary   | Binary pseudo charset       | binary              |      1 |
+| geostd8  | GEOSTD8 Georgian            | geostd8_general_ci  |      1 |
+| cp932    | SJIS for Windows Japanese   | cp932_japanese_ci   |      2 |
+| eucjpms  | UJIS for Windows Japanese   | eucjpms_japanese_ci |      3 |
++----------+-----------------------------+---------------------+--------+
+39 rows in set (0.01 sec)
+
+2）增加MySQL管理员
+
+
+#第一种方法
+mysql>GRANT ALL PRIVILEGES ON *.* TO dba@localhost IDENTIFIED BY 'password..' WITH GRANT OPTION;
+mysql>GRANT ALL PRIVILEGES ON *.* TO dba@"%" IDENTIFIED BY 'password..' WITH GRANT OPTION;
+ 
+#第二种方法
+
+mysql>INSERT INTO user VALUES('localhost','dba',PASSWORD('password..'), 'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y')
+mysql>INSERT INTO user VALUES('%','dba',PASSWORD('password..'), 'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y')
+
+3）刷新权限
+FLUSH PRIVILEGES;
