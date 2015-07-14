@@ -114,11 +114,32 @@ c5="\[\e[35m\]"
 c6="\[\e[36m\]"  
 c7="\[\e[37m\]"  
 PS1="$c1\u$c2@\h$c3[\t]$c4[no:\!]$5$c6[pwd:\w]$c7$c1\n$c2>";
-export PAGER=less
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
+export LANG=zh_CN.UTF-8
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias .......='cd ../../../../../..'
+
+
+###############################################################################
+####                                                                          #
+#### 在根目录下新建链接到 C: D: E: F: ..... 等盘的符号链接 并且 alias到对应磁盘
+#### /cygdrive/c  => /c   c 命令直接到  C:盘 ##################################
+#### /cygdrive/d  => /d   d 命令直接到  D:盘                                  #
+#### /cygdrive/e  => /e   e 命令直接到  E:盘                                  #
+####                                                                          #
+###############################################################################
+if [ -d /cygdrive ]
+then
+    for x in /cygdrive/*
+    do
+        [ -d "$x" ] && [ ! -d "/${x##*/}" ]  &&  ln -s "$x" "/${x##*/}"
+        alias "${x##*/}"="cd /${x##*/}/"
+    done
+fi
+
+if [[ -x /usr/local/bin/tmux && -z "$TMUX" ]]  ## 自动开启tmux
+then
+    /usr/local/bin/tmux
+fi
