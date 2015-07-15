@@ -119,21 +119,22 @@ fi
 ####   5 => [闪烁 ]  25 => [非闪烁]
 ####   7 => [反显 ]  27 => [非反显 ]
 
-b1="\[\e[1m\]"
-u1="\[\e[5;35;46m\]"
-u2="\[\e[5;30;45m\]"
-u3="\[\e[0;37;44m\]"
-u4="\[\e[5;32;44m\]"
-u5="\[\e[4;31;40m\]"
-u6="\[\e[5;30;43m\]"
-u0="\[\e[5;37;40m\]"
-r1="\[\e[22m\]"
-r2="\[\e[24m\]"
-r3="\[\e[25m\]"
-r4="\[\e[27m\]"
+blod1="\[\e[1m\]"
+color1="\[\e[0;32;40m\]"
+color2="\[\e[0;37;41m\]"
+color3="\[\e[0;35;47m\]"
+color4="\[\e[0;30;42m\]"
+color5="\[\e[0;33;44m\]"
+color6="\[\e[5;37;40m\]"
 
-# PS1="$c1\u$c2@\h$c3[\t]$c4[no:\!]$5$c6[pwd:\w]$c7$c1\n$c2>";
-PS1="$u1$b1\u$u2@\h$r2$u3[\t]$u4[no:\!]$u5[pwd:\w]$u6\n$u0$r2>$r4";
+unblod1="\[\e[22m\]"
+reset0="\[\e[0m\]"
+reset24="\[\e[24m\]"
+reset25="\[\e[25m\]"
+reset27="\[\e[27m\]"
+
+PS1="$color1$blod1\u$color2@\h$unblod1$color3[\t]$color4[no:\!]$color5[pwd:\w]$color6\n->";
+PS2="$color2->$reset0"
 export LANG=zh_CN.UTF-8
 alias ...='cd ../..'
 alias ....='cd ../../..'
