@@ -44,12 +44,12 @@ esac
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
     else
-	color_prompt=
+    color_prompt=
     fi
 fi
 
@@ -104,21 +104,63 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
-c1="\[\e[0m\]"  
-c0="\[\e[30m\]"  
-c1="\[\e[31m\]"  
-c2="\[\e[32m\]"  
-c3="\[\e[33m\]"  
-c4="\[\e[34m\]"  
-c5="\[\e[35m\]"  
-c6="\[\e[36m\]"  
-c7="\[\e[37m\]"  
-PS1="$c1\u$c2@\h$c3[\t]$c4[no:\!]$5$c6[pwd:\w]$c7$c1\n$c2>";
-export PAGER=less
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
+
+#  "\[\e[5;35;46m\]"
+#  \[\e[  : 转义开始
+#  m\]     : 转义结束
+#  5      : 表示显示属性《说明一》
+#  35     : 前端颜色，可选值[30 31 32 33 34 35 36 37]
+#  46     : 背景颜色，可选值[40 41 42 44 44 45 46 47]
+
+####《说明一》 : 在第一个转义序列后面的“0”是提示符的文本的默认颜色设置。 对于文本属性来说，这些值是有意义的：
+####   0 => [默认值] 
+####   1 => [粗体 ]  22 => [非粗体 ]
+####   4 => [下划线] 24 => [非下划线]
+####   5 => [闪烁 ]  25 => [非闪烁]
+####   7 => [反显 ]  27 => [非反显 ]
+
+blod1="\[\e[1m\]"
+color1="\[\e[0;32;40m\]"
+color2="\[\e[0;37;41m\]"
+color3="\[\e[0;35;47m\]"
+color4="\[\e[0;30;42m\]"
+color5="\[\e[0;33;44m\]"
+color6="\[\e[5;37;40m\]"
+
+unblod1="\[\e[22m\]"
+reset0="\[\e[0m\]"
+reset24="\[\e[24m\]"
+reset25="\[\e[25m\]"
+reset27="\[\e[27m\]"
+
+PS1="$color1$blod1\u$color2@\h$unblod1$color3[\t]$color4[no:\!]$color5[pwd:\w]$color6\n->";
+PS2="$color2->$reset0"
+export LANG=zh_CN.UTF-8
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias .......='cd ../../../../../..'
+
+
+###############################################################################
+####                                                                          #
+#### 在根目录下新建链接到 C: D: E: F: ..... 等盘的符号链接 并且 alias到对应磁盘
+#### /cygdrive/c  => /c   c 命令直接到  C:盘 ##################################
+#### /cygdrive/d  => /d   d 命令直接到  D:盘                                  #
+#### /cygdrive/e  => /e   e 命令直接到  E:盘                                  #
+####                                                                          #
+###############################################################################
+if [ -d /cygdrive ]
+then
+    for x in /cygdrive/*
+    do
+        [ -d "$x" ] && [ ! -d "/${x##*/}" ]  &&  ln -s "$x" "/${x##*/}"
+        alias "${x##*/}"="cd /${x##*/}/"
+    done
+fi
+
+if [[ -x /usr/local/bin/tmux && -z "$TMUX" ]]  ## 自动开启tmux
+then
+    /usr/local/bin/tmux
+fi
