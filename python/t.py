@@ -63,7 +63,7 @@ class wcq:
 me = wcq();
 me1 =  {"name": 'wcq' , 'gender':'male' , "age": 30}
 for k in me1:
-    print(k,me1[k])
+    pass #print(k,me1[k])
 
 # class wcq:
 #     def name(self , name):
@@ -115,3 +115,9 @@ for k in me1:
 
 # t3 = time.time()
 # print(" fib() : %d \n fib2() : %d \n" %(t2-t1 , t3-t2))
+
+f = open('d:/t.pl');
+ary = f.readlines();
+for l in ary:
+    printf(l , l);
+f.close();
