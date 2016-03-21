@@ -1,0 +1,41 @@
+如果没有特例请按照以下路径安装服务器上的软件 ; x86  和 x64 上的软件有差异请区别对待
+
+建议先将防火墙关闭，而且所有的软件更改默认的端口；等到安装完毕后再根据实际的规则将防火墙配置好并且打开。 service iptables stop
+建议先关闭SELINUX : /usr/sbin/setenforce 0  
+vim /etc/sysconfig/selinux 
+SELINUX=disabled
+
+打开sshd  chkconfig --level 35 sshd on
+sshd 改用12345 端口 : 修改/etc/ssh/sshd_config  添加 Port 12345
+
+0.准备
+    用户和组
+    groupadd mysql && useradd -M -d /var/lib/mysql -s /sbin/nologin -g mysql mysql
+    groupadd www   && useradd -M -s /sbin/nologin -g www www
+
+    建好目录 mkdir -p /server/logs && chown -R www:www /server
+
+    安装必须的软件：
+yum -y install cmake  
+yum -y install gcc gcc-c++ make flex bison autoconf automake bzip2-devel zlib-devel gd-devel ncurses-devel libjpeg-devel libpng-devel libtiff-devel freetype-devel pam-devel openssl-devel libxml2-devel gettext-devel pcre-devel
+yum -y install ntp libc-client-devel vim-enhanced curl  gettext-devel apr-devel apr-util-devel  gmp-devel pspell-devel  pam-devel libtiff-devel  libjpeg-devel  libmcrypt-devel freetype libevent* libtool
+yum -y install perl-Net-SSLeay perl-Crypt-SSLeay perl-DBI perl-DBD-MySQL
+yum -y install apr*  curl-devel  openssl openssl-devel pcre-devel gd kernel keyutils perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-libs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel libXpm*  libjpeg* libpng* php-common php-gd ncurses* libtool* libxml2  patch
+  
+
+1. 先安装mysql
+    参照 《mysql安装.txt》
+
+2. 安装nginx
+    参照 《nginx安装.txt》
+
+3. 安装php-fpm
+    参照 《php-fpm安装.txt》
+
+
+
+
+
+
+
+

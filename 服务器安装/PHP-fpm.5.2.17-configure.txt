@@ -1,0 +1,61 @@
+gzip -cd php-5.2.17-fpm-0.5.14.diff.gz | patch -d php-5.2.17 -p1
+
+错误：
+如果提示"configure: error: libjpeg.(a|so) not found"错误
+cp -frp /usr/lib64/libjpeg.* /usr/lib/
+
+错误：
+注意过程中还会提示" Configure: error: libpng.(also) not found."错误,解决办法和上面的一样.
+cp -frp /usr/lib64/libpng* /usr/lib/
+
+错误：
+ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.so
+
+错误：
+yum -y install krb5*
+ln -s /usr/lib64 /usr/kerberos/lib
+
+/opt/php-5.2.17/configure \
+--prefix=/usr/local/php \
+--disable-ipv6 \
+--disable-debug \
+--enable-fastcgi  \
+--enable-fpm  \
+--enable-soap \
+--enable-sockets \
+--enable-gd-native-ttf \
+--enable-ftp \
+--enable-mbstring \
+--enable-exif \
+--enable-dom \
+--with-openssl \
+--with-mysql=/usr/local/mysql \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
+--with-mysql-sock=/tmp \
+--with-gd \
+--with-jpeg-dir \
+--with-png-dir \
+--with-freetype-dir \
+--with-iconv-dir \
+--with-zlib-dir \
+--with-mcrypt \
+--with-pear \
+--with-curl \
+--with-libxml-dir \
+--with-imap \
+--with-imap-ssl \
+--with-kerberos \
+--with-mhash \
+--enable-cli
+
+make -j 8 && make install
+
+ln -s /usr/local/php/bin/pear       /usr/local/bin/pear
+ln -s /usr/local/php/bin/peardev    /usr/local/bin/peardev
+ln -s /usr/local/php/bin/pecl       /usr/local/bin/pecl
+ln -s /usr/local/php/bin/phar.phar  /usr/local/bin/phar
+ln -s /usr/local/php/bin/php        /usr/local/bin/php
+ln -s /usr/local/php/bin/phpize     /usr/local/bin/phpize
+ln -s /usr/local/php/bin/php-config /usr/local/bin/php-config
+ln -s /usr/local/php/sbin/php-fpm   /usr/local/sbin/php-fpm

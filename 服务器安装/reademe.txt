@@ -1,0 +1,22 @@
+﻿测试服务器信息
+
+ip : 192.168.4.5
+ssh 端口 : 12345
+
+root 密码 wotu123
+新建了wotu 用户 (全名为wotufullname) 密码 wt1234
+新建了两个用户组 www 和 mysql 这两个组下分别有一个用户 www 和 mysql 【mysql组是系统本身就有的-如果没有必须加上】
+
+服务器上新建了 /server 目录
+
+所有的编译安装的软件都在 /opt 目录下  configure的 prefix 都是/usr/local 打头的
+
+安装了
+
+libiconv
+mhash
+libcrypt
+
+php-5.4.36   /usr/local/php  【apc-3.1.13  php-fpm以www用户运行】        
+mysql-5.5.30 /usr/local/mysql【以mysql用户运行】
+nginx-1.6.2  /usr/local/nginx【日志在/server/log 以www用户运行 在vhost下配置了一个 tt.com.conf 虚拟主机】
