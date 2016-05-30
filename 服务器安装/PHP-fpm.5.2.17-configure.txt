@@ -15,6 +15,20 @@ ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.so
 yum -y install krb5*
 ln -s /usr/lib64 /usr/kerberos/lib
 
+
+第二次编译报错如下：
+configure: error: Cannot find libmysqlclient under /usr.
+Note that the MySQL client library is not bundled anymore!
+
+这个错误时因为在64位的linux系统中，libmysqlclient 默认安装到了 /usr/lib64/mysql/ 目录下，但是php编译时，要去/usr/lib目录下查找
+解决办法：在/usr/lib目录下创建一个软连接
+[root@localhost php-5.3.28]# ls /usr/lib64/mysql/libmysqlclient*
+/usr/lib64/mysql/libmysqlclient_r.so     /usr/lib64/mysql/libmysqlclient_r.so.16.0.0  /usr/lib64/mysql/libmysqlclient.so.16
+/usr/lib64/mysql/libmysqlclient_r.so.16  /usr/lib64/mysql/libmysqlclient.so           /usr/lib64/mysql/libmysqlclient.so.16.0.0
+
+[root@localhost php-5.3.28]# ln -s /usr/lib64/mysql/libmysqlclient.so.16 /usr/lib/libmysqlclient.so
+
+
 /opt/php-5.2.17/configure \
 --prefix=/usr/local/php \
 --disable-ipv6 \
@@ -29,9 +43,9 @@ ln -s /usr/lib64 /usr/kerberos/lib
 --enable-exif \
 --enable-dom \
 --with-openssl \
---with-mysql=/usr/local/mysql \
---with-mysqli=/usr/local/mysql/bin/mysql_config \
---with-pdo-mysql=/usr/local/mysql/bin/mysql_config \
+--with-mysql=/usr/local/mysql_old \
+--with-mysqli=/usr/local/mysql_old/bin/mysql_config \
+--with-pdo-mysql=/usr/local/mysql_old/bin/mysql_config \
 --with-mysql-sock=/tmp \
 --with-gd \
 --with-jpeg-dir \

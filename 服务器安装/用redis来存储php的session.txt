@@ -1,0 +1,33 @@
+redis服务端安装
+cd /opt
+wget http://download.redis.io/releases/redis-3.2.0.tar.gz
+tar xzf redis-3.2.0.tar.gz
+cd redis-3.2.0
+make && make install && cp -a redis.conf /etc/
+echo "\n/usr/local/bin/redis-server /etc/redis.conf\n" >> /etc/rc.local
+
+安装redis php模块
+cd /opt
+git clone --depth 1 git://github.com/owlient/phpredis.git
+cd phpredis
+phpize
+./configure --with-php-config=/usr/bin/php-config
+make && make install
+
+
+如果编译安装成功redis.so后
+加载 redis.so
+extension=redis.so
+
+在php.ini 中改变session的存储方式(php.ini可以通过phpinfo.php查看到)
+session.save_handler = redis
+session.save_path  = "tcp://127.0.0.1:6379"
+
+如果是php 5.3版本的还要注意 php-fpm.conf (php-fpm.conf可以通过phpinfo.php查看到)中是不是设置了以下两个值（它们的优先级比较高）
+
+php_value[session.save_handler] = redis
+php_value[session.save_path] = "tcp://127.0.0.1:6379"
+
+service php-fpm restart
+service nginx restart
+
