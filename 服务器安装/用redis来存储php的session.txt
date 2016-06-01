@@ -1,4 +1,4 @@
-redis服务端安装
+redis服务端安装  
 cd /opt
 wget http://download.redis.io/releases/redis-3.2.0.tar.gz
 tar xzf redis-3.2.0.tar.gz
@@ -7,6 +7,7 @@ make && make install && cp -a redis.conf /etc/
 echo "\n/usr/local/bin/redis-server /etc/redis.conf\n" >> /etc/rc.local
 
 安装redis php模块
+#### http://pecl.php.net/package/redis
 cd /opt
 git clone --depth 1 git://github.com/owlient/phpredis.git
 cd phpredis
