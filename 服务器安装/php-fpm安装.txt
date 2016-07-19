@@ -112,14 +112,14 @@ make -j 4 ZEND_EXTRA_LIBS='-liconv'
 ### 如果前面没有加 -liconv 这里必须加 make 参数 make -j 4 ZEND_EXTRA_LIBS='-liconv'
 make -j 16  && make install   
 
-ln -s /usr/local/php/bin/pear       /usr/local/bin/pear
-ln -s /usr/local/php/bin/peardev    /usr/local/bin/peardev
-ln -s /usr/local/php/bin/pecl       /usr/local/bin/pecl
-ln -s /usr/local/php/bin/phar.phar  /usr/local/bin/phar
-ln -s /usr/local/php/bin/php        /usr/local/bin/php
-ln -s /usr/local/php/bin/phpize     /usr/local/bin/phpize
-ln -s /usr/local/php/bin/php-config /usr/local/bin/php-config
-ln -s /usr/local/php/sbin/php-fpm   /usr/local/sbin/php-fpm
+ln -s /usr/local/php54/bin/pear       /usr/local/bin/pear
+ln -s /usr/local/php54/bin/peardev    /usr/local/bin/peardev
+ln -s /usr/local/php54/bin/pecl       /usr/local/bin/pecl
+ln -s /usr/local/php54/bin/phar.phar  /usr/local/bin/phar
+ln -s /usr/local/php54/bin/php        /usr/local/bin/php
+ln -s /usr/local/php54/bin/phpize     /usr/local/bin/phpize
+ln -s /usr/local/php54/bin/php-config /usr/local/bin/php-config
+ln -s /usr/local/php54/sbin/php-fpm   /usr/local/sbin/php-fpm
 
 cp -f /opt/php-5.4.36/php.ini-production /usr/local/php/etc/php.ini
 cp -f /opt/php-5.4.36/sapi/fpm/php-fpm.conf /usr/local/php/etc/php-fpm.conf
