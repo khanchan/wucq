@@ -4,5 +4,5 @@ using namespace std;
 
 void show_name(){
 
-    cout<<"hello my name is wuchangqian \n";
+    cout<<"hello my name is  \n"<<MY_NAME;
 }
